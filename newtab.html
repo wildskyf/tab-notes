@@ -5,6 +5,7 @@
   <title>Write Notes</title>
   <style>
   body {
+    color: #343434;
     padding: 0;
     margin: 0;
   }
@@ -17,12 +18,50 @@
     min-height: 100vh;
     height: auto;
     padding: 4rem 20%;
+    resize: none;
+    transition-duration: .2s;
     width: 100%;
   }
+  #note-content.dark {
+    background: #343434;
+    color: #fff;
+  }
+  #mode-switcher {
+    border: 1px solid #777;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 20px;
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    transition-duration: .2s;
+    width: 20px;
+    z-index: 999;
+  }
+  #mode-switcher[data-current="day"] { background: #777; }
+  #mode-switcher[data-current="night"] { background: #fff; }
+
+  #addon-author {
+    background: #DD4A68;
+    bottom: 12px;
+    border: 1px solid #DD4A68;
+    color: #fff;
+    font-family: serif;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px;
+    position: fixed;
+    text-decoration: none;
+    transition-duration: .2s;
+    right: 12px;
+  }
+  #addon-author:hover { background: #E28699; border-color: #E28699; }
   </style>
 </head>
 <body>
   <textarea id="note-content" placeholder="write some notes..."></textarea>
+  <div id="mode-switcher" data-current="day"></div>
+  <a id="addon-author" href="https://github.com/wildskyf">WS</a>
 </body>
 </html>
 
