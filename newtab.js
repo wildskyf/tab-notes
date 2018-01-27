@@ -1,32 +1,22 @@
-var VERSION = 2;
-
 window.onload = () => {
   var $textarea = document.querySelector('#note-content');
   var $mode_switcher = document.querySelector('#mode-switcher');
 
   var initNote = () => {
-    browser.storage.sync.get().then( data => {
-
-      if (data.version === undefined) {
+    browser.storage.sync.get().then(data => {
+      if (data.content === undefined) {
         data = {
-          version: VERSION,
           content: '',
           mode: 'day'
         };
-        browser.storage.sync.set(data);
-      }
-      else if (data.version === 1) {
-        browser.storage.sync.set({
-          version: VERSION,
-          mode: 'day'
-        });
       }
 
+      browser.storage.sync.set(data);
       $textarea.value = data.content;
     });
 
     // Mode
-    browser.storage.sync.get().then( data => {
+    browser.storage.sync.get().then(data => {
       $mode_switcher.dataset.current = data.mode || "day";
       if (data.mode == "night") {
         $textarea.classList.add('dark');
@@ -55,4 +45,3 @@ window.onload = () => {
     browser.storage.sync.set({ mode: isDay ? 'night' : 'day' });
   });
 };
-
