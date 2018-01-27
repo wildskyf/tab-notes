@@ -2,20 +2,16 @@
   "applications": {
     "gecko": {
       "id": "note-tab@wildsky.cc",
-       "strict_min_version": "54.0a1"
+      "strict_min_version": "54.0a1"
     }
   },
-
   "manifest_version": 2,
   "name": "Tab Notes",
   "version": "1.2.0",
-
   "description": "Allow you to write anything in new tab",
-
   "permissions": [
-    "storage", "identity"
+    "storage"
   ],
-
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   }
