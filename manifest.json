@@ -1,18 +1,26 @@
 {
+  "manifest_version": 2,
+  "name": "Tab Notes",
+  "version": "1.4.0",
   "applications": {
     "gecko": {
-      "id": "note-tab@wildsky.cc",
+      "id": "{7efc4c2e-b578-431b-b1f5-384dddf42e45}",
       "strict_min_version": "54.0a1"
     }
   },
-  "manifest_version": 2,
-  "name": "Tab Notes",
-  "version": "1.3.0",
   "description": "Allow you to write anything in new tab",
   "permissions": [
     "storage"
   ],
+  "background": {
+    "scripts": [
+      "newtab.js"
+    ]
+  },
   "chrome_url_overrides": {
     "newtab": "newtab.html"
-  }
+  },
+  "web_accessible_resources": [
+    "newtab.html"
+  ]
 }
