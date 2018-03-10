@@ -53,7 +53,7 @@ window.onload = () => {
   // when user writing
   $textarea.addEventListener('keyup', event => {
     clearTimeout(writeTimeout);
-    writeTimeout = setTimeout(() => updateStorage(event.target.value), 1000);
+    writeTimeout = setTimeout(() => updateStorage(event.target.value), 300);
   });
 
   // day and night mode switcher
