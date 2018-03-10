@@ -64,6 +64,13 @@ window.onload = () => {
     browser.storage.sync.set({ mode: reverseMode });
   });
 
+  window.addEventListener('keypress', e => {
+    if (!(e.which == 115 && (e.ctrlKey || e.metaKey)) && !(e.which == 19)) return;
+    e.preventDefault();
+    clearTimeout(writeTimeout);
+    updateStorage(event.target.value)
+  });
+
   // re-init when actived window or tab changed
   browser.tabs.onActivated.addListener(initNote);
   browser.windows.onFocusChanged.addListener(initNote);
