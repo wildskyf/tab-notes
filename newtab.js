@@ -5,9 +5,10 @@ const theme = {
 };
 
 window.onload = () => {
-  var writeTimeout;
+  var write_timeout, saved_timeout;
   var $textarea = document.querySelector('#note-content');
   var $mode_switcher = document.querySelector('#mode-switcher');
+  var $status = document.querySelector('#status');
 
   var initNote = () => {
     browser.storage.sync.get().then( data => {
@@ -48,12 +49,20 @@ window.onload = () => {
     });
   };
 
-  var updateStorage = newData => browser.storage.sync.set({ content: newData });
+  var updateStorage = newData => {
+    browser.storage.sync.set({ content: newData });
+    $status.classList.remove('hide');
+    $status.textContent = 'Saved.';
+    clearTimeout(saved_timeout);
+    write_timeout = setTimeout(() => $status.classList.add('hide'), 3000);
+  };
 
   // when user writing
   $textarea.addEventListener('keyup', event => {
-    clearTimeout(writeTimeout);
-    writeTimeout = setTimeout(() => updateStorage(event.target.value), 300);
+    $status.classList.remove('hide');
+    $status.textContent = 'Saving...'
+    clearTimeout(write_timeout);
+    write_timeout = setTimeout(() => updateStorage(event.target.value), 250);
   });
 
   // day and night mode switcher
@@ -67,7 +76,7 @@ window.onload = () => {
   window.addEventListener('keypress', e => {
     if (!(e.which == 115 && (e.ctrlKey || e.metaKey)) && !(e.which == 19)) return;
     e.preventDefault();
-    clearTimeout(writeTimeout);
+    clearTimeout(write_timeout);
     updateStorage(event.target.value)
   });
 

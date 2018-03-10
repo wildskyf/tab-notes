@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Write Notes</title>
   <style>
+  .hide { display: none !important; }
+
   body {
     color: #343434;
     padding: 0;
@@ -42,6 +44,13 @@
   #mode-switcher[data-current="day"] { background: #777; }
   #mode-switcher[data-current="night"] { background: #fff; }
 
+  #status {
+    bottom: 12px;
+    filter: invert(100%);
+    position: fixed;
+    left: 12px;
+  }
+
   #addon-author {
     background: #DD4A68;
     bottom: 12px;
@@ -62,6 +71,7 @@
 <body>
   <textarea id="note-content" placeholder="write some notes..."></textarea>
   <div id="mode-switcher" data-current="day"></div>
+  <span id="status"></span>
   <a id="addon-author" href="https://github.com/wildskyf">WS</a>
 </body>
 </html>
