@@ -5,6 +5,7 @@ const theme = {
 };
 
 window.onload = () => {
+  console.log(browser);
   var write_timeout, saved_timeout;
   var $textarea = document.querySelector('#note-content');
   var $mode_switcher = document.querySelector('#mode-switcher');

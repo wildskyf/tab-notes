@@ -10,9 +10,15 @@
   "version": "1.4.0",
   "description": "Allow you to write anything in new tab",
   "permissions": [
-    "storage"
+    "storage", "tabs"
   ],
   "chrome_url_overrides": {
     "newtab": "newtab.html"
+  },
+  "background": {
+    "scripts": [
+      "browser-polyfill.min.js",
+      "background.js"
+    ]
   }
 }
