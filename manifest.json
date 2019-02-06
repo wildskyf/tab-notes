@@ -7,7 +7,7 @@
   },
   "manifest_version": 2,
   "name": "Tab Notes",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Allow you to write anything in new tab",
   "permissions": [
     "storage"
