@@ -1,5 +1,9 @@
 ;(() => {
-  const VERSION = 2
+  const defaultPreference = {
+    version: 2,
+    content: '',
+    mode: 'day'
+  }
   const theme = {
     night: "night",
     day: "day"
@@ -12,22 +16,7 @@
     let $status = document.querySelector('#status')
 
     let initNote = async () => {
-      let data = await browser.storage.sync.get()
-
-      // update database
-      if (data.version === undefined) {
-        browser.storage.sync.set({
-          version: VERSION,
-          content: '',
-          mode: 'day'
-        })
-      }
-      else if (data.version === 1) {
-        browser.storage.sync.set({
-          version: VERSION,
-          mode: 'day'
-        })
-      }
+      let data = await window.utils.loadPreference(defaultPreference)
 
       // theme
       if (data.mode == theme.night) {
