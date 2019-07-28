@@ -5,6 +5,12 @@
       "strict_min_version": "54.0a1"
     }
   },
+  "icons": {
+    "48": "icons/48.png",
+    "96": "icons/96.png",
+    "96": "icons/128.png",
+    "96": "icons/256.png"
+  },
   "manifest_version": 2,
   "name": "Tab Notes",
   "version": "1.7.0",
