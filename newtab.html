@@ -5,6 +5,7 @@
   <link type="image/x-icon" href="./favicon.ico" rel="icon" />
   <title>Tab Notes</title>
   <script type="text/javascript" src="./browser-polyfill.min.js"></script>
+  <script type="text/javascript" src="./migration.js"></script>
   <script type="text/javascript" src="./utils.js"></script>
   <script type="text/javascript" src="./newtab.js"></script>
   <style>
@@ -26,7 +27,6 @@
     height: auto;
     padding: 4rem 20%;
     resize: none;
-    transition-duration: .2s;
     width: 100%;
   }
   #note-content.dark {
@@ -41,12 +41,11 @@
     position: fixed;
     top: 12px;
     right: 12px;
-    transition-duration: .2s;
     width: 20px;
     z-index: 999;
   }
-  #mode-switcher[data-current="day"] { background: #777; }
-  #mode-switcher[data-current="night"] { background: #fff; }
+  #mode-switcher { background: #777; }
+  .dark + #mode-switcher { background: #fff; }
 
   #status {
     bottom: 12px;
@@ -66,13 +65,165 @@
     padding: 2px;
     position: fixed;
     text-decoration: none;
-    transition-duration: .2s;
     right: 12px;
   }
   #addon-author:hover { background: #E28699; border-color: #E28699; }
+
+  /* Multi-note */
+  #list-trigger {
+    position: fixed;
+    top: 12px;
+    left: 14px;
+    width: 16px;
+    cursor: pointer;
+  }
+  #list-trigger:before,
+  #list-trigger span,
+  #list-trigger:after {
+    width: 16px;
+    height: 5px;
+    float: left;
+    content: '';
+    display: inline-block;
+    box-shadow: 0 2px 0 #343434;
+    border-bottom: 2px solid #fff;
+  }
+
+  #list {
+    box-sizing: border-box;
+    width: 250px;
+    position: absolute;
+    top: 0;
+    left: -250px;
+    bottom: 0;
+    overflow: auto;
+
+    background: #eee;
+    color: #343434;
+    box-shadow: inset -7px 0 5px -6px rgba(0,0,0,0.5);
+  }
+  #list .list-inner {
+    position: relative;
+    padding: 4rem 20px;
+  }
+
+  #create_entry {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    box-sizing: border-box;
+    width: 22px;
+    height: 22px;
+    color: #aaa;
+    background: #fff;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    border: 1px solid #aaa;
+    border-radius: 50%;
+  }
+
+  #create_entry.delete {
+    transform: rotate(45deg);
+    color: #E28699;
+    border-color: #E28699;
+  }
+  .dark #create_entry.delete {
+    transform: rotate(45deg);
+    color: #E28699;
+    border-color: #E28699;
+  }
+
+  .dark #create_entry {
+    background: #343434;
+    color: #777;
+    border: 1px solid #777;
+  }
+
+  #list ul {
+    padding: 0 0 calc(20px + 1rem);
+    margin: 0;
+    list-style-type: none;
+  }
+  #list li > span {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    box-sizing: border-box;
+    border-bottom: 1px solid #ddd;
+    color: #999;
+    cursor: pointer;
+  }
+  #list li span > span {
+    font-size: 1.25rem;
+    margin-right: .25rem;
+  }
+  #list li span > span.empty-string {
+    font-size: 1rem;
+    opacity: 0.5;
+    margin-right: 0;
+  }
+
+
+  #list .current {
+    position: relative;
+  }
+  #list .current:before {
+    content: '';
+    display: inline-block;
+    border: 2px solid;
+    position: absolute;
+    top: calc(50% - 4px);
+    left: -3px;
+    border-color: #343434;
+  }
+  #list .current > span, #list .current a:hover {
+    cursor: default;
+    color: #343434;
+  }
+  #list li > span:hover {
+    color: #666;
+  }
+  #list.dark {
+    background: #292929;
+    color: #fff;
+    box-shadow: inset -7px 0 5px -6px rgba(0,0,0,0.5);
+  }
+  #list.dark li > span {
+    border-bottom: 1px solid #343434;
+    color: #aaa;
+  }
+  #list.dark li > span:hover {
+    color: #ddd;
+  }
+  #list.dark .current:before {
+    border-color: #ddd;
+  }
+  #list.dark .current > span, #list.dark .current a:hover {
+    color: #ddd;
+  }
+
+  #list-indicator:checked ~ #list {
+    left: 0;
+  }
+  #list-indicator:checked ~ #note-content {
+    margin-left: 250px;
+    padding: 4rem 10%;
+    width: calc(100vw - 250px);
+  }
   </style>
 </head>
 <body>
+  <input type="checkbox" id="list-indicator" class="hide" />
+  <div id="list">
+    <div class="list-inner">
+      <ul></ul>
+      <div id="create_entry">+</div>
+    </div>
+  </div>
+  <label id="list-trigger" for="list-indicator">
+    <span></span>
+  </label>
   <textarea id="note-content" placeholder="write some notes..."></textarea>
   <div id="mode-switcher" data-current="day"></div>
   <span id="status"></span>
