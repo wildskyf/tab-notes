@@ -12,7 +12,7 @@ Open new tab and write anything.
 
 ## Download
 
-Tab Notes* is available to the following browsers:
+Tab Notes is available to the following browsers:
 * [Firefox](https://addons.mozilla.org/firefox/addon/tab-notes/)
 * [Chrome](https://chrome.google.com/webstore/detail/tab-notes/obnnegakmgonaiplaobihpmcjhlceeic)
 
