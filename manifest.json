@@ -20,5 +20,20 @@
   ],
   "chrome_url_overrides": {
     "newtab": "newtab.html"
+  },
+
+  "browser_action": {
+    "browser_style": true,
+    "default_icon": "icons/48.png",
+    "default_title": "Tab notes",
+    "default_popup": "newtab.html"
+  },
+
+  "commands": {
+    "_execute_browser_action": {
+      "suggested_key": {
+        "default": "Ctrl+Y"
+      }
+    }
   }
 }
