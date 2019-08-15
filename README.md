@@ -8,7 +8,12 @@ Open new tab and write anything.
 * **Theme**: Support light and dark theme.
 * **Lightweight and fast**
 * **Multi-notes**
+* **Browser-action with shortcut**: You could use it without changing your current new tab page
 * Open-source
+
+## Shortcuts
+
+- `Ctrl/Cmd + Y`: To open the browser-action tab notes.
 
 ## Download
 
