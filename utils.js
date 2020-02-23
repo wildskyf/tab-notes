@@ -6,6 +6,7 @@
   window.utils = {
     loadPreference: async () => {
       let results = await browser.storage.sync.get()
+      results.list = results.list && results.list.sort((a, b) => b.time - a.time)
 
       if ((typeof results.length === 'number') && (results.length > 0)) {
         results = results[0]

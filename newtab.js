@@ -6,6 +6,7 @@
     *   mode: <string>
     *   list: [{
     *       content: <string>
+    *       time: <number>
     *   }]
     * }
     **/
@@ -24,15 +25,19 @@
     let currentNoteId = 0
     let data = null
 
-    const _emptyNote = () => JSON.parse('{ "content": "" }')
+    const _emptyNote = () => {
+      const emptyNote = Object.create(null)
+      emptyNote.content = ''
+      emptyNote.time = (new Date()).getTime()
+      return emptyNote
+    }
 
     const _render = () => {
-
       const _renderList = list => {
         const _makeTitleString = content => content.substr(0, 10).replace(/\n/g, '') || '<span class="empty-string">(EMPTY)</span>'
         const $ul = document.querySelector('ul')
 
-        $ul.innerHTML = list.map((item, index) => {
+        $ul.innerHTML = list.sort((a, b) => b.time - a.time).map((item, index) => {
           let title = _makeTitleString(item.content)
           let className = index === currentNoteId ? 'current' : ''
           return `<li class="${className}" data-id="${index}"><span>${title}<div class='del'>+</div></span></li>`
@@ -95,6 +100,8 @@
       // auto saving and indicator
       let write_timeout, saved_timeout
       $textarea.addEventListener('keyup', () => {
+        if (data.list[currentNoteId].content === $textarea.value) { return }
+
         $status.classList.remove('hide')
         $status.textContent = 'Saving...'
 
@@ -106,6 +113,8 @@
           }
 
           data.list[currentNoteId].content = $textarea.value
+          data.list[currentNoteId].time = (new Date()).getTime()
+          currentNoteId = 0
           browser.storage.sync.set({ list: data.list })
           _renderStatusDone()
           clearTimeout(saved_timeout)
@@ -118,8 +127,8 @@
 
     const _createButtonEventHandler = () => {
       $create_entry.addEventListener('click', () => {
-        currentNoteId = data.list.length
-        data.list.push(_emptyNote())
+        currentNoteId = 0
+        data.list = [_emptyNote(), ...data.list]
         browser.storage.sync.set({ list: data.list })
 
         _render()
@@ -176,11 +185,6 @@
 
     const init = async () => {
       data = await window.utils.loadPreference()
-      console.log(data)
-
-      if (data.list.length === 0) {
-        data.list.push(_emptyNote())
-      }
 
       _render()
       _renderTheme()
