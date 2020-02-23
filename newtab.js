@@ -24,7 +24,7 @@
     let currentNoteId = 0
     let data = null
 
-    const _emptyNote = () => ({ content: '' })
+    const _emptyNote = () => JSON.parse('{ "content": "" }')
 
     const _render = () => {
 
@@ -35,11 +35,28 @@
         $ul.innerHTML = list.map((item, index) => {
           let title = _makeTitleString(item.content)
           let className = index === currentNoteId ? 'current' : ''
-          return `<li class="${className}" data-id="${index}"><span>${title}</span></li>`
+          return `<li class="${className}" data-id="${index}"><span>${title}<div class='del'>+</div></span></li>`
         }).join('')
 
         $ul.querySelectorAll('li').forEach(function($li, index){
-          $li.addEventListener('click', function(){
+          $li.addEventListener('click', function(event){
+            if (event.target.classList.contains('del')) {
+              if (index === 0 && data.list.length === 1) {
+                data.list = [_emptyNote()]
+              }
+              else {
+                data.list = data.list.filter((note, i) => i !== index)
+                if (currentNoteId >= data.list.length) {
+                  currentNoteId = data.list.length - 1
+                }
+              }
+
+              browser.storage.sync.set({ list: data.list })
+
+              _render()
+              return
+            }
+
             if (currentNoteId === index) { return }
             currentNoteId = index
             _render()
@@ -48,22 +65,12 @@
       }
 
       const _renderNote = note => {
-        $textarea.value = note.content || ""
+        $textarea.value = note.content || ''
         $textarea.focus()
-      }
-
-      const _renderActionButton = () => {
-        if (data.list.length > 1 && data.list[currentNoteId].content === '') {
-          $create_entry.classList.add('delete')
-        }
-        else {
-          $create_entry.classList.remove('delete')
-        }
       }
 
       _renderList(data.list)
       _renderNote(data.list[currentNoteId])
-      _renderActionButton()
     }
 
     const _enableAnimation = () => {
@@ -104,33 +111,9 @@
 
     const _createButtonEventHandler = () => {
       $create_entry.addEventListener('click', () => {
-
-        if (data.list.length === 1 && data.list[0].content === '') {
-          $status.classList.remove('hide')
-          $status.innerHTML ='Note will be created,<br /> only when current note is not empty.'
-          setTimeout(() => { $status.classList.add('hide') }, 3000)
-        }
-
-
-
-        if ($create_entry.classList.contains('delete')) {
-          data.list = data.list.filter((note, index) => index !== currentNoteId)
-          if (currentNoteId >= data.list.length) {
-            currentNoteId = data.list.length - 1
-          }
-          browser.storage.sync.set({ list: data.list })
-          _render()
-          return
-        }
-
-        if (data.list.filter(note => !note.content).length > 0) {
-          currentNoteId = data.list.findIndex(note => !note.content)
-        }
-        else {
-          currentNoteId = data.list.length
-          data.list.push(_emptyNote())
-          browser.storage.sync.set({ list: data.list })
-        }
+        currentNoteId = data.list.length
+        data.list.push(_emptyNote())
+        browser.storage.sync.set({ list: data.list })
 
         _render()
       })
@@ -186,6 +169,7 @@
 
     const init = async () => {
       data = await window.utils.loadPreference()
+      console.log(data)
 
       if (data.list.length === 0) {
         data.list.push(_emptyNote())

@@ -125,17 +125,6 @@
     border-radius: 50%;
   }
 
-  #create_entry.delete {
-    transform: rotate(45deg);
-    color: #E28699;
-    border-color: #E28699;
-  }
-  .dark #create_entry.delete {
-    transform: rotate(45deg);
-    color: #E28699;
-    border-color: #E28699;
-  }
-
   .dark #create_entry {
     background: #343434;
     color: #777;
@@ -147,6 +136,9 @@
     margin: 0;
     list-style-type: none;
   }
+  #list li ::selection {
+    background-color: transparent;
+  }
   #list li > span {
     display: block;
     padding: 10px;
@@ -155,6 +147,7 @@
     border-bottom: 1px solid #ddd;
     color: #999;
     cursor: pointer;
+    position: relative;
   }
   #list li span > span {
     font-size: 1.25rem;
@@ -165,8 +158,27 @@
     opacity: 0.5;
     margin-right: 0;
   }
-
-
+  #list li span .del {
+    display: none;
+    position: absolute;
+    right: 0;
+    cursor: pointer;
+    opacity: 0.5;
+    font-family: sans-serif;
+    font-size: 1.5rem;
+    box-sizing: border-box;
+    width: 22px;
+    height: 22px;
+    text-align: center;
+    line-height: 20px;
+    transform: rotate(45deg);
+  }
+  #list li:hover span .del {
+    display: inline-block;
+  }
+  #list li:hover span .del:hover {
+    opacity: 1;
+  }
   #list .current {
     position: relative;
   }
