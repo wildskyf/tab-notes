@@ -41,6 +41,10 @@
         $ul.querySelectorAll('li').forEach(function($li, index){
           $li.addEventListener('click', function(event){
             if (event.target.classList.contains('del')) {
+              const noteTitle = _makeTitleString(list[index].content)
+              const deleteConfirmString = `Do you want to delete note: ${noteTitle} ?\nThis can't be undo.`
+              if (!confirm(deleteConfirmString)) { return }
+
               if (index === 0 && data.list.length === 1) {
                 data.list = [_emptyNote()]
               }
