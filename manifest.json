@@ -13,7 +13,7 @@
   },
   "manifest_version": 2,
   "name": "Tab Notes",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Allow you to write anything in new tab",
   "permissions": [
     "storage"
