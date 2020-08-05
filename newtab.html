@@ -19,6 +19,48 @@
     min-width: 800px;
     min-height: 600px;
   }
+
+  #annoucement {
+    background: #eee;
+    color: #000;
+    padding: 15px 60px;
+    position: fixed;
+    width: 100%;
+    font-family: sans-serif;
+  }
+  #annoucement > div {
+    border: 1px solid #fff;
+    background: #fff;
+    color: #000;
+    display: inline-block;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 5px 5px;
+    border-radius: 3px;
+    transition-duration: .3s;
+  }
+  #annoucement > div:hover {
+    border: 1px solid #eee;
+    background: #eee;
+    color: #000;
+  }
+  #annoucement a { color: #000; }
+
+  body.dark #annoucement {
+    background: #000;
+    color: #fff;
+  }
+  body.dark #annoucement > div {
+    border: 1px solid #fff;
+    background: #000;
+    color: #fff;
+  }
+  body.dark #annoucement > div:hover {
+    background: #fff;
+    color: #000;
+  }
+  body.dark #annoucement a { color: #fff; }
+
   #note-content {
     box-sizing: border-box;
     border: 0;
@@ -228,6 +270,7 @@
   </style>
 </head>
 <body>
+  <div class='annoucement-container'></div>
   <input type="checkbox" id="list-indicator" class="hide" />
   <div id="list">
     <div class="list-inner">

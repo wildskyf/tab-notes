@@ -16,6 +16,7 @@
       night: "night",
       day: "day"
     }
+    const $body = document.querySelector('body')
     const $textarea = document.querySelector('textarea')
     const $list = document.querySelector('#list')
     const $mode_switcher = document.querySelector('#mode-switcher')
@@ -63,7 +64,7 @@
                 }
               }
 
-              browser.storage.sync.set({ list: data.list })
+              browser.storage.local.set({ list: data.list })
 
               _render()
               return
@@ -115,7 +116,7 @@
           data.list[currentNoteId].content = $textarea.value
           data.list[currentNoteId].time = (new Date()).getTime()
           currentNoteId = 0
-          browser.storage.sync.set({ list: data.list })
+          browser.storage.local.set({ list: data.list })
           _renderStatusDone()
           clearTimeout(saved_timeout)
           _render()
@@ -129,7 +130,7 @@
       $create_entry.addEventListener('click', () => {
         currentNoteId = 0
         data.list = [_emptyNote(), ...data.list]
-        browser.storage.sync.set({ list: data.list })
+        browser.storage.local.set({ list: data.list })
 
         _render()
       })
@@ -137,10 +138,12 @@
 
     const _renderTheme = () => {
       if (data.mode == THEMES.night) {
+        $body.classList.add('dark')
         $textarea.classList.add('dark')
         $list.classList.add('dark')
       }
       else {
+        $body.classList.remove('dark')
         $textarea.classList.remove('dark')
         $list.classList.remove('dark')
       }
@@ -148,11 +151,12 @@
 
     const _themeSwitchHandler = () => {
       $mode_switcher.addEventListener('click', event => {
+        $body.classList.toggle('dark')
         $textarea.classList.toggle('dark')
         $list.classList.toggle('dark')
 
         data.mode = data.mode === THEMES.day ? THEMES.night : THEMES.day
-        browser.storage.sync.set({ mode: data.mode })
+        browser.storage.local.set({ mode: data.mode })
         _renderTheme()
       })
     }
@@ -183,9 +187,35 @@
       _multiTabHandler()
     }
 
+    const _renderAnnoucement = async () => {
+      const res = await browser.storage.sync.get()
+      if (false && !res.list && !res.mode) { return } // not use the version using storage.sync
+
+      const $annoucement_container = document.querySelector('.annoucement-container')
+      $annoucement_container.innerHTML = `
+        <div id='annoucement'>
+          Due to <a href='https://blog.mozilla.org/addons/2020/07/09/changes-to-storage-sync-in-firefox-79/' target='_blank'>Firefox WebExtension Storage API update</a>,
+          the sync function between Firefox is not work anymore...
+          <div class='btn'>So sad, I get it.</div>
+        </div>
+      `
+      const $migrate_btn = $annoucement_container.querySelector('.btn')
+      const migrateBtnOnClick = async () => {
+        $migrate_btn.removeEventListener('click', migrateBtnOnClick)
+        const before = await browser.storage.sync.get()
+        const clearRes = await browser.storage.sync.clear()
+        const after = await browser.storage.sync.get()
+        $annoucement_container.remove()
+      }
+
+      $migrate_btn.addEventListener('click', migrateBtnOnClick)
+
+    }
+
     const init = async () => {
       data = await window.utils.loadPreference()
 
+      _renderAnnoucement()
       _render()
       _renderTheme()
       _initEventHandler()

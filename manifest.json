@@ -16,7 +16,7 @@
   "version": "2.3.0",
   "description": "Allow you to write anything in new tab",
   "permissions": [
-    "storage"
+    "storage", "unlimitedStorage"
   ],
   "chrome_url_overrides": {
     "newtab": "newtab.html"

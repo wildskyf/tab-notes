@@ -5,7 +5,7 @@
 ;(() => {
   window.utils = {
     loadPreference: async () => {
-      let results = await browser.storage.sync.get()
+      let results = await browser.storage.local.get()
       results.list = results.list && results.list.sort((a, b) => b.time - a.time)
 
       if ((typeof results.length === 'number') && (results.length > 0)) {
@@ -13,7 +13,7 @@
       }
 
       if (!results.version) {
-        await browser.storage.sync.set(defaultPreference)
+        await browser.storage.local.set(defaultPreference)
         return defaultPreference
       }
 
@@ -35,7 +35,7 @@
       }), results)
 
 
-      await browser.storage.sync.set(update)
+      await browser.storage.local.set(update)
       return update
     }
   }

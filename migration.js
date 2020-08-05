@@ -16,8 +16,8 @@ const defaultPreference = {
       }]
       results.version = defaultPreference.version
       delete results.content
-      await browser.storage.sync.set(results)
-      browser.storage.sync.remove('content')
+      await browser.storage.local.set(results)
+      browser.storage.local.remove('content')
     }
 
     if (results.version === 3) {
@@ -28,7 +28,7 @@ const defaultPreference = {
         }
       })
       results.version = defaultPreference.version
-      await browser.storage.sync.set(results)
+      await browser.storage.local.set(results)
     }
   }
 })()
