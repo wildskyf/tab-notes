@@ -6,13 +6,14 @@
   window.utils = {
     loadPreference: async () => {
       let results = await browser.storage.local.get()
+      let syncResults = await browser.storage.sync.get()
       results.list = results.list && results.list.sort((a, b) => b.time - a.time)
 
       if ((typeof results.length === 'number') && (results.length > 0)) {
         results = results[0]
       }
 
-      if (!results.version) {
+      if (!results.version && !syncResults.version) {
         await browser.storage.local.set(defaultPreference)
         return defaultPreference
       }
@@ -22,7 +23,7 @@
       }
       else {
         if (window.migration) {
-          await window.migration(results)
+          await window.migration(results, syncResults)
         }
       }
 

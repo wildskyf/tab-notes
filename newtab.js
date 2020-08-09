@@ -188,9 +188,10 @@
     }
 
     const _renderAnnoucement = async () => {
-      const res = await browser.storage.sync.get()
-      if (false && !res.list && !res.mode) { return } // not use the version using storage.sync
+      const syncRes = await browser.storage.sync.get()
+      if (!syncRes.list && !syncRes.mode) { return } // not use the version using storage.sync
 
+      // annoucement
       const $annoucement_container = document.querySelector('.annoucement-container')
       $annoucement_container.innerHTML = `
         <div id='annoucement'>

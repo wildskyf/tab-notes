@@ -1,6 +1,6 @@
 /* global browser */
 const defaultPreference = {
-  version: 4,
+  version: 5,
   mode: 'day',
   list: [{
     content: '',
@@ -9,7 +9,7 @@ const defaultPreference = {
 }
 
 ;(() => {
-  window.migration = async results => {
+  window.migration = async (results, syncResult) => {
     if (results.version === 2) {
       results.list = [{
         content: results.content || ''
@@ -27,6 +27,14 @@ const defaultPreference = {
           time: (new Date()).getTime()
         }
       })
+      results.version = defaultPreference.version
+      await browser.storage.local.set(results)
+    }
+
+    if (syncResult.version === 4 && results.version !== 5) {
+      // migrate from storage.sync to storage.local
+      results.list = syncResult.list,
+      results.mode = syncResult.mode,
       results.version = defaultPreference.version
       await browser.storage.local.set(results)
     }
