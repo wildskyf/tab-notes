@@ -35,7 +35,7 @@
 
     const _render = () => {
       const _renderList = list => {
-        const _makeTitleString = content => content.substr(0, 10).replace(/\n/g, '') || '<span class="empty-string">(EMPTY)</span>'
+        const _makeTitleString = (content) => content.split("\n")[0].substr(0,20) || "New Note";
         const $ul = document.querySelector('ul')
 
         $ul.innerHTML = list.sort((a, b) => b.time - a.time).map((item, index) => {
@@ -50,7 +50,7 @@
               const currentNote = list[index]
               if (currentNote.content !== '') {
                 const noteTitle = _makeTitleString(currentNote.content)
-                const deleteConfirmString = `Do you want to delete note: ${noteTitle} ?\nThis can't be undo.`
+                const deleteConfirmString = `Are you sure you want to delete \`${noteTitle}\`?\nThis action cannot be undone.`
                 if (!confirm(deleteConfirmString)) { return }
               }
 
@@ -110,7 +110,7 @@
         write_timeout = setTimeout(() => {
           const _renderStatusDone = () => {
             $status.classList.remove('hide')
-            $status.textContent = 'Saved.'
+            $status.textContent = 'Saved!'
           }
 
           data.list[currentNoteId].content = $textarea.value
