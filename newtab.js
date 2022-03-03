@@ -20,6 +20,7 @@
     const $textarea = document.querySelector('textarea')
     const $list = document.querySelector('#list')
     const $mode_switcher = document.querySelector('#mode-switcher')
+    const $setting_gear = document.querySelector('#setting-icon')
     const $status = document.querySelector('#status')
     const $create_entry = document.querySelector('#create_entry')
 
@@ -161,6 +162,12 @@
       })
     }
 
+    const _settingHandler = () => {
+      $setting_gear.addEventListener('click', event => {
+        window.open('export.html')
+      })
+    }
+
     const _multiTabHandler = () => {
       const loadLatestData = async updateTabInfo => {
         let currentTabInfo = await browser.tabs.getCurrent()
@@ -184,6 +191,7 @@
       _noteEventHandler()
       _createButtonEventHandler()
       _themeSwitchHandler()
+      _settingHandler()
       _multiTabHandler()
     }
 

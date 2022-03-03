@@ -257,3 +257,42 @@ body.dark #annoucement a { color: #fff; }
   width: calc(100vw - 250px);
 }
 
+.setting-icon-container {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+}
+
+#setting-icon {
+  background: white;
+  border: 0.2857142857em solid gray;
+  display: inline-block;
+  position: relative;
+  margin: 0.2em;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  box-sizing: border-box;
+  transition-duration: .3s;
+  cursor: pointer;
+}
+
+.dark #setting-icon {
+  background: #343434;
+}
+
+#setting-icon:before, #setting-icon:after {
+  color: gray;
+  content: "×";
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "times new roman";
+  font-weight: bold;
+  font-size: 2.5em;
+}
+#setting-icon:after {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
