@@ -9,13 +9,13 @@ Open new tab and write anything.
 * **Lightweight and fast**
 * **Multi-notes**
 * **Browser-action with shortcut**: You could use it without changing your current new tab page
+* * **Undo delete**: Undo deleting last note
 * Open-source
 
 ## Features I want to add:
 
-* **Undo delete**: Undo deleting last note
-* **Markdown text editing**: Add markdown support
 * **Add to Google Keep**: Add a "add to Google Keep button", to automatically add the current note to Google Keep
+* **Markdown text editing**: Add markdown support
 
 ## Shortcuts
 
