@@ -12,11 +12,6 @@ Open new tab and write anything.
 * * **Undo delete**: Undo deleting last note
 * Open-source
 
-## Features I want to add:
-
-* **Add to Google Keep**: Add a "add to Google Keep button", to automatically add the current note to Google Keep
-* **Markdown text editing**: Add markdown support
-
 ## Shortcuts
 
 - `Ctrl/Cmd + Y`: To open the browser-action tab notes.
