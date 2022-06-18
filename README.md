@@ -9,7 +9,7 @@ Open new tab and write anything.
 * **Lightweight and fast**
 * **Multi-notes**
 * **Browser-action with shortcut**: You could use it without changing your current new tab page
-* * **Undo delete**: Undo deleting last note
+* **Undo delete**: Undo deleting last note
 * Open-source
 
 ## Shortcuts
