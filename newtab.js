@@ -23,10 +23,11 @@
     const $setting_gear = document.querySelector('#setting-icon')
     const $status = document.querySelector('#status')
     const $create_entry = document.querySelector('#create_entry')
+    const $undo_deletion = document.querySelector("#undo_deletion")
 
     let currentNoteId = 0
     let data = null
-    let undostack = null
+    let undostack = []
 
     const _emptyNote = () => {
       const emptyNote = Object.create(null)
@@ -52,20 +53,23 @@
               const currentNote = list[index]
               if (currentNote.content !== '') {
                 const noteTitle = _makeTitleString(currentNote.content)
-                const deleteConfirmString = `Do you want to delete note: ${noteTitle} ?\nThis can't be undone.`
+                const deleteConfirmString = `Do you want to delete note: ${noteTitle}?`
                 if (!confirm(deleteConfirmString)) { return }
               }
-
+              //this code is responsible for deleting notes
+              //if after deleting this note, the list of notes will be empty:
               if (index === 0 && data.list.length === 1) {
+                undostack.push(data.list[index])
                 data.list = [_emptyNote()]
               }
+              //if after deleting this note, the list of notes is not empty:
               else {
+                undostack.push(data.list[index])
                 data.list = data.list.filter((note, i) => i !== index)
                 if (currentNoteId >= data.list.length) {
                   currentNoteId = data.list.length - 1
                 }
               }
-
               browser.storage.local.set({ list: data.list })
 
               _render()
@@ -138,6 +142,19 @@
       })
     }
 
+    const _undoButtonEventHandler = () => {
+      $undo_deletion.addEventListener('click', () => {
+        if (undostack.length > 0) {
+          data.list = [...data.list, undostack.pop()]
+          browser.storage.local.set({ list: data.list })
+          
+          _render()
+        } else {
+          alert("Nothing to undo.")
+        }
+      })
+    }
+
     const _renderTheme = () => {
       if (data.mode == THEMES.night) {
         $body.classList.add('dark')
@@ -191,6 +208,7 @@
     const _initEventHandler = () => {
       _noteEventHandler()
       _createButtonEventHandler()
+      _undoButtonEventHandler()
       _themeSwitchHandler()
       _settingHandler()
       _multiTabHandler()

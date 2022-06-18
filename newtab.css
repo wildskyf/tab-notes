@@ -162,6 +162,28 @@ body.dark #annoucement a { color: #fff; }
   border: 1px solid #777;
 }
 
+#undo_deletion {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  box-sizing: border-box;
+  width: 100px;
+  height: 22px;
+  color: #000;
+  background: #fff;
+  text-align: center;
+  line-height: 20px;
+  cursor: pointer;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+.dark #undo_deletion {
+  background: #343434;
+  color: #fff;
+  border: 1px solid #777;
+}
+
 #list ul {
   padding: 0 0 calc(20px + 1rem);
   margin: 0;
