@@ -26,6 +26,7 @@
 
     let currentNoteId = 0
     let data = null
+    let undostack = null
 
     const _emptyNote = () => {
       const emptyNote = Object.create(null)
@@ -51,7 +52,7 @@
               const currentNote = list[index]
               if (currentNote.content !== '') {
                 const noteTitle = _makeTitleString(currentNote.content)
-                const deleteConfirmString = `Do you want to delete note: ${noteTitle} ?\nThis can't be undo.`
+                const deleteConfirmString = `Do you want to delete note: ${noteTitle} ?\nThis can't be undone.`
                 if (!confirm(deleteConfirmString)) { return }
               }
 
