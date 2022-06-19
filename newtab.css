@@ -176,12 +176,11 @@ body.dark #annoucement a { color: #fff; }
   cursor: pointer;
   border: 1px solid #aaa;
   border-radius: 5px;
-  display: none
 }
 
 .dark #undo_deletion {
   background: #343434;
-  color: #fff;
+  color: #aaa;
   border: 1px solid #777;
 }
 
