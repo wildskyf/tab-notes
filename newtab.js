@@ -47,6 +47,12 @@
           return `<li class="${className}" data-id="${index}"><span>${title}<div class='del'>+</div></span></li>`
         }).join('')
 
+        if (undostack.length > 0) {
+          $undo_deletion.style.display = "block"
+        } else {
+          $undo_deletion.style.display = "none"
+        }
+
         $ul.querySelectorAll('li').forEach(function($li, index){
           $li.addEventListener('click', function(event){
             if (event.target.classList.contains('del')) {
