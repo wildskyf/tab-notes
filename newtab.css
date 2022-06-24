@@ -50,10 +50,12 @@ body.dark #annoucement > div:hover {
 }
 body.dark #annoucement a { color: #fff; }
 
+/*this is note textarea*/
 #note-content {
   box-sizing: border-box;
   border: 0;
   font-size: 18px;
+  font-family: monospace;
   line-height: 1.75rem;
   margin: 0;
   min-height: 100vh;
@@ -61,11 +63,23 @@ body.dark #annoucement a { color: #fff; }
   padding: 4rem 20%;
   resize: none;
   width: 100%;
+  vertical-align: middle;
 }
 #note-content.dark {
   background: #343434;
   color: #fff;
 }
+
+strong {
+  font-weight: bold;
+}
+
+input.larger {
+  height: 18px;
+  width: 18px;
+  margin: 0;
+}
+
 #mode-switcher {
   border: 1px solid #777;
   border-radius: 50%;

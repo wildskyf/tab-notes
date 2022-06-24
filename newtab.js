@@ -17,7 +17,7 @@
       day: "day"
     }
     const $body = document.querySelector('body')
-    const $textarea = document.querySelector('textarea')
+    const $textarea = document.querySelector('#note-content')
     const $list = document.querySelector('#list')
     const $mode_switcher = document.querySelector('#mode-switcher')
     const $setting_gear = document.querySelector('#setting-icon')
@@ -35,6 +35,8 @@
       emptyNote.time = (new Date()).getTime()
       return emptyNote
     }
+
+    
 
     const _render = () => {
       const _renderList = list => {
@@ -119,6 +121,7 @@
         $status.textContent = 'Saving...'
 
         clearTimeout(write_timeout)
+        console.log($textarea.value);
         write_timeout = setTimeout(() => {
           const _renderStatusDone = () => {
             $status.classList.remove('hide')

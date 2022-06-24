@@ -12,6 +12,9 @@ Open new tab and write anything.
 * **Undo delete**: Undo deleting last note
 * Open-source
 
+## Upcoming features:
+* **Markdown**: Add markdown support with 
+
 ## Shortcuts
 
 - `Ctrl/Cmd + Y`: To open the browser-action tab notes.
