@@ -92,7 +92,7 @@
       }
 
       const _renderNote = note => {
-        $textarea.value = note.content || ''
+        $textarea.textContent = note.content || ''
         $textarea.focus()
       }
 
@@ -115,7 +115,7 @@
       // auto saving and indicator
       let write_timeout, saved_timeout
       $textarea.addEventListener('keyup', () => {
-        if (data.list[currentNoteId].content === $textarea.value) { return }
+        if (data.list[currentNoteId].content === $textarea.textContent) { return }
 
         $status.classList.remove('hide')
         $status.textContent = 'Saving...'
@@ -128,7 +128,7 @@
             $status.textContent = 'Saved.'
           }
 
-          data.list[currentNoteId].content = $textarea.value
+          data.list[currentNoteId].content = $textarea.textContent
           data.list[currentNoteId].time = (new Date()).getTime()
           currentNoteId = 0
           browser.storage.local.set({ list: data.list })
