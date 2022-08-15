@@ -92,7 +92,7 @@
       }
 
       const _renderNote = note => {
-        $textarea.textContent = note.content || ''
+        $textarea.innerHTML = note.content || ''
         $textarea.focus()
       }
 
@@ -115,26 +115,27 @@
       // auto saving and indicator
       let write_timeout, saved_timeout
       $textarea.addEventListener('keyup', () => {
-        if (data.list[currentNoteId].content === $textarea.textContent) { return }
+        //if note didnt change
+        if (data.list[currentNoteId].content === $textarea.innerHTML) { return }
 
         $status.classList.remove('hide')
         $status.textContent = 'Saving...'
 
         clearTimeout(write_timeout)
-        console.log($textarea.value);
         write_timeout = setTimeout(() => {
           const _renderStatusDone = () => {
             $status.classList.remove('hide')
             $status.textContent = 'Saved.'
           }
 
-          data.list[currentNoteId].content = $textarea.textContent
+          data.list[currentNoteId].content = $textarea.innerHTML
           data.list[currentNoteId].time = (new Date()).getTime()
           currentNoteId = 0
           browser.storage.local.set({ list: data.list })
           _renderStatusDone()
           clearTimeout(saved_timeout)
-          _render()
+          //remove render, because I directly edit the innerHTML, and if it attempts to render, it'll reset the caret position
+          //_render()
           saved_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
         }, 250)
       })
@@ -191,7 +192,7 @@
 
     const _settingHandler = () => {
       $setting_gear.addEventListener('click', event => {
-        window.open('export.html')
+        window.open('settings.html')
       })
     }
 

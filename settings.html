@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Settings Page | Tab Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora&family=Roboto&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="./browser-polyfill.min.js"></script>
+  <script type="text/javascript" src="./migration.js"></script>
+  <script type="text/javascript" src="./utils.js"></script>
+  <script type="text/javascript" src="./settings.js"></script>
+  <link rel='stylesheet' href='./settings.css'>
+  <style></style> <!-- for lazy css loading -->
+</head>
+<body>
+    <div id="title">
+        Tab notes settings
+    </div>
+    <hr class="solid">
+    <p><div id="font-selector" class="subtitle">Font family:</div>
+        <div id="monospace-option" class="option">
+            <input type="radio" name="font-selector" value="monospace" id="monospace">
+            <label for="monospace">monospace</label>
+        </div>
+        <div id="roboto-option" class="option">
+            <input type="radio" name="font-selector" value="roboto" id="roboto">
+            <label for="roboto">&nbspRoboto</label>
+        </div>
+        <div id="roboto-mono-option" class="option">
+            <input type="radio" name="font-selector" value="roboto-mono" id="roboto-mono">
+            <label for="roboto-mono">Roboto Mono</label>
+        </div>
+        <div id="lora-option" class="option">
+            <input type="radio" name="font-selector" value="lora" id="lora">
+            <label for="lora">&nbspLora</label>
+        </div>
+    </p>
+
+    <hr>
+
+    <p><div id="font-size" class="subtitle">Font size:</div>
+        <div id="tiny-option" class="option">
+            <input type="radio" name="size-selector" value="tiny" id="tiny">
+            <label for="tiny">&nbsp&nbsp&nbsp&nbspTiny</label>
+        </div>
+        <div id="small-option" class="option">
+            <input type="radio" name="size-selector" value="small" id="small">
+            <label for="small">&nbsp&nbsp&nbspSmall</label>
+        </div>
+        <div id="regular-option" class="option">
+            <input type="radio" name="size-selector" value="regular" id="regular">
+            <label for="regular">&nbsp&nbspRegular</label>
+        </div>
+        <div id="large-option" class="option">
+            <input type="radio" name="size-selector" value="large" id="large">
+            <label for="large">&nbspLarge</label>
+        </div>
+        <div id="huge-option" class="option">
+            <input type="radio" name="size-selector" value="huge" id="huge">
+            <label for="huge">Huge</label>
+        </div>
+    </p>
+
+    <hr>
+</body>
+
+</html>
