@@ -29,6 +29,11 @@ hr.solid {
 
 .option {
     margin-left: 20px;
+    display: flex;
+}
+
+input[type="radio"] {
+    margin-right: 10px;
 }
 
 #monospace-option {
@@ -48,23 +53,108 @@ hr.solid {
 }
 
 #tiny-option {
-    font-size: 10px;
+    font-size: 8px;
 }
 
 #small-option {
-    font-size: 13px;
+    font-size: 12px;
 }
 
-#regular-option {
+#default-option {
     font-size: 18px;
 }
 
 #large-option {
-    font-size: 26px;
+    font-size: 30px;
 }
 
 #huge-option {
     font-size: 50px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    width: 46px;
+    height: 20px;
+    float: right;
+    margin-right: 30px;
+    margin-top: 5px;
+}
+  
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+  
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+  
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+  
+input:checked + .slider {
+    background-color: #2196F3;
+}
+  
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+  
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+  
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+  
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.switch-label {
+    margin-left: 30px;
+}
+
+.button {
+    background-color: #2196F3;
+    cursor: pointer;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    float: right;
+    margin-right: 30px;
 }
 
 #note-content {
