@@ -14,6 +14,10 @@
 
         let data = null
 
+        const _fillSettings = () => {
+            $dark_mode_switch.checked = data.mode == THEMES.night
+        }
+
         const _fontSizeHandler = () => {
             $font_selector.addEventListener('click', event => {
                 if ( event.target && event.target.matches("input[type='radio']") ) {
@@ -41,6 +45,19 @@
             })
         }
 
+        const _renderTheme = () => {
+            if (data.mode == THEMES.night) {
+              $body.classList.add('dark')
+              $textarea.classList.add('dark')
+              $list.classList.add('dark')
+            }
+            else {
+              $body.classList.remove('dark')
+              $textarea.classList.remove('dark')
+              $list.classList.remove('dark')
+            }
+        }
+
         const _initEventHandler = () => {
             _fontSizeHandler()
             _darkModeSwitchHandler()
@@ -50,6 +67,7 @@
             data = await window.utils.loadPreference()
 
             _initEventHandler()
+            _fillSettings()
         }
         return {
             init: init
