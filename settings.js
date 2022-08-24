@@ -11,11 +11,14 @@
         $font_selector = document.querySelector("#font-selector")
         $export_button = document.querySelector("#export-button")
         $dark_mode_switch = document.querySelector("#dark-mode-toggle")
+        $body = document.querySelector("body")
 
         let data = null
 
         const _fillSettings = () => {
-            $dark_mode_switch.checked = data.mode == THEMES.night
+            _renderTheme()
+            $dark_mode_switch.checked = data.mode === THEMES.night
+            console.log(data.mode === THEMES.night);
         }
 
         const _fontSizeHandler = () => {
@@ -26,12 +29,13 @@
                 }
             })
         }
-
+        
+        //if you swithc to dark mode in the notes tab, the settings tab should go dark too
         const _darkModeSwitchHandler = () => {
             $dark_mode_switch.addEventListener('click', event => {
               $body.classList.toggle('dark')
-              $textarea.classList.toggle('dark')
-              $list.classList.toggle('dark')
+              //$textarea.classList.toggle('dark')
+              //$list.classList.toggle('dark')
       
               data.mode = data.mode === THEMES.day ? THEMES.night : THEMES.day
               browser.storage.local.set({ mode: data.mode })
@@ -48,13 +52,13 @@
         const _renderTheme = () => {
             if (data.mode == THEMES.night) {
               $body.classList.add('dark')
-              $textarea.classList.add('dark')
-              $list.classList.add('dark')
+              //$textarea.classList.add('dark')
+              //$list.classList.add('dark')
             }
             else {
               $body.classList.remove('dark')
-              $textarea.classList.remove('dark')
-              $list.classList.remove('dark')
+              //$textarea.classList.remove('dark')
+              //$list.classList.remove('dark')
             }
         }
 

@@ -209,6 +209,7 @@
 
         data = await window.utils.loadPreference()
         _render()
+        _renderTheme()
       }
       browser.tabs.onActivated.addListener(loadLatestData)
       // XXX: Window event causing double click issue, should temporarily comment it when default open sidebar...
@@ -259,6 +260,7 @@
       _initEventHandler()
       _enableAnimation()
     }
+    
     return {
       init: init
     }
