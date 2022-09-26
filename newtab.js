@@ -1,4 +1,5 @@
 ;(() => {
+  
   // FIXME: Should use uuid instead of index as key for storage
   /** DB
     * {
@@ -38,15 +39,15 @@
 
     
 
-    const _render = () => {
+    const _render = (rendernote) => {
       const _renderList = list => {
-        const _makeTitleString = content => content.substr(0, 10).replace(/\n/g, '') || '<span class="empty-string">(EMPTY)</span>'
+        const _makeTitleString = content => content.substr(0, 50).replace(/<.*?>/g, '').replace(/[^A-Za-z0-9 ]/g, '').substr(0, 10) || '<span class="empty-string">(EMPTY)</span>'
         const $ul = document.querySelector('ul')
 
         $ul.innerHTML = list.sort((a, b) => b.time - a.time).map((item, index) => {
           let title = _makeTitleString(item.content)
           let className = index === currentNoteId ? 'current' : ''
-          return `<li class="${className}" data-id="${index}"><span>${title}<div class='del'>+</div></span></li>`
+          return `<li class="${className}" data-id="${index}"><span>${title}<div class='del'>+</div><div class='dnld'><img class="dnldimg" src="./dnld.png" alt="Download"></div></span></li>`
         }).join('')
 
         if (undostack.length > 0) {
@@ -57,6 +58,7 @@
 
         $ul.querySelectorAll('li').forEach(function($li, index){
           $li.addEventListener('click', function(event){
+            //console.log($textarea.innerText || $textarea.textContent)
             if (event.target.classList.contains('del')) {
               const currentNote = list[index]
               if (currentNote.content !== '') {
@@ -80,13 +82,40 @@
               }
               browser.storage.local.set({ list: data.list })
 
-              _render()
+              _render(true)
+              return
+            }
+            else if (event.target.classList.contains('dnld') || event.target.classList.contains('dnldimg')) {
+              //console.log("download");
+              currentNoteId = index
+              _render(true)
+              const noteTitle = _makeTitleString(list[index].content)
+              //const dbutton = $li.querySelector('.dnld');
+              //console.log(dbutton);
+              
+              var userInput = $textarea.innerText;
+			
+              var blob = new Blob([userInput], { type: "text/plain;charset=utf-8" });
+
+              let newLink = document.createElement("a");
+              newLink.download = `${noteTitle}.txt`;
+
+              if (window.webkitURL != null) {
+                newLink.href = window.webkitURL.createObjectURL(blob);
+              }
+              else {
+                newLink.href = window.URL.createObjectURL(blob);
+                newLink.style.display = "none";
+                document.body.appendChild(newLink);
+              }
+    
+              newLink.click();
               return
             }
 
             if (currentNoteId === index) { return }
             currentNoteId = index
-            _render()
+            _render(true)
           })
         })
       }
@@ -97,7 +126,9 @@
       }
 
       _renderList(data.list)
-      _renderNote(data.list[currentNoteId])
+      if (rendernote) {
+        _renderNote(data.list[currentNoteId])
+      }
     }
 
     const _enableAnimation = () => {
@@ -135,7 +166,9 @@
           _renderStatusDone()
           clearTimeout(saved_timeout)
           //remove render, because I directly edit the innerHTML, and if it attempts to render, it'll reset the caret position
-          //_render()
+          //TODO: the sidebar does need to be rerendered
+          _render(false);
+        
           saved_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
         }, 250)
       })
@@ -148,7 +181,7 @@
         data.list = [_emptyNote(), ...data.list]
         browser.storage.local.set({ list: data.list })
 
-        _render()
+        _render(true)
       })
     }
 
@@ -158,7 +191,7 @@
           data.list = [...data.list, undostack.pop()]
           browser.storage.local.set({ list: data.list })
           
-          _render()
+          _render(true)
         } else {
           alert("Nothing to undo.")
         }
@@ -208,7 +241,7 @@
         }
 
         data = await window.utils.loadPreference()
-        _render()
+        _render(true)
         _renderTheme()
       }
       browser.tabs.onActivated.addListener(loadLatestData)
@@ -255,7 +288,7 @@
       data = await window.utils.loadPreference()
 
       _renderAnnoucement()
-      _render()
+      _render(true)
       _renderTheme()
       _initEventHandler()
       _enableAnimation()
