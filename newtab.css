@@ -58,12 +58,12 @@ body.dark #annoucement a { color: #fff; }
   font-family: monospace;
   line-height: 1.75rem;
   margin: 0;
-  min-height: 100vh;
-  height: auto;
+  height: 100vh;
   padding: 4rem 20%;
   resize: none;
   width: 100%;
   vertical-align: middle;
+  overflow: auto;
 }
 #note-content.dark {
   background: #343434;
@@ -87,7 +87,7 @@ input.larger {
   height: 20px;
   position: fixed;
   top: 12px;
-  right: 12px;
+  right: 22px;
   width: 20px;
   z-index: 999;
 }
@@ -112,7 +112,7 @@ input.larger {
   padding: 2px;
   position: fixed;
   text-decoration: none;
-  right: 12px;
+  right: 22px;
 }
 #addon-author:hover { background: #E28699; border-color: #E28699; }
 
@@ -358,4 +358,24 @@ input.larger {
 }
 #setting-icon:after {
   transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* width */
+#note-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+#note-content::-webkit-scrollbar-track {
+  background: #9e9e9e3d;
+}
+
+/* Handle */
+#note-content::-webkit-scrollbar-thumb {
+  background: #8888888c;
+}
+
+/* Handle on hover */
+#note-content::-webkit-scrollbar-thumb:hover {
+  background: #5555558c;
 }

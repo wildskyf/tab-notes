@@ -30,6 +30,11 @@
     let data = null
     let undostack = []
 
+	$textarea.addEventListener("paste", function (event) {
+		event.preventDefault();
+		document.execCommand("inserttext", false, event.clipboardData.getData("text/plain"));
+	})
+
     const _emptyNote = () => {
       const emptyNote = Object.create(null)
       emptyNote.content = ''
