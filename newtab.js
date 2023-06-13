@@ -218,6 +218,7 @@
         $textarea.classList.remove('dark')
         $list.classList.remove('dark')
       }
+	  $mode_switcher.hidden = !data.darktoggleonnotes
 	  $credits_button.hidden = !data.showcredits
     }
 

@@ -25,6 +25,7 @@
 		$font_size_selector = document.querySelector("#font-size-selector")
         $export_button = document.querySelector("#export-button")
         $dark_mode_switch = document.querySelector("#dark-mode-toggle")
+		$dark_toggle_on_notes_switch = document.querySelector("#dark-toggle-on-notes-toggle")
 		$credits_switch = document.querySelector("#credits-toggle")
         $body = document.querySelector("body")
 
@@ -68,6 +69,14 @@
             })
         }
 
+		const _darkToggleOnNotesHandler = () => {
+			$dark_toggle_on_notes_switch.addEventListener('click', event => {
+				data.darktoggleonnotes = data.darktoggleonnotes === true ? false : true
+				browser.storage.local.set({ darktoggleonnotes: data.darktoggleonnotes })
+				_renderTheme()
+			})
+		}
+
 		const _creditsSwitchHandler = () => {
 			$credits_switch.addEventListener('click', event => {
 				data.showcredits = data.showcredits === true ? false : true
@@ -95,12 +104,24 @@
             }
         }
 
+		const _multiTabHandler = () => {
+			const loadLatestData = async updateTabInfo => {
+			  data = await window.utils.loadPreference()
+			  _renderTheme()
+			}
+			browser.tabs.onActivated.addListener(loadLatestData)
+			// XXX: Window event causing double click issue, should temporarily comment it when default open sidebar...
+			browser.windows.onFocusChanged.addListener(loadLatestData)
+		  }
+
         const _initEventHandler = () => {
             _fontHandler()
 			_fontSizeHandler()
             _darkModeSwitchHandler()
+			_darkToggleOnNotesHandler()
 			_creditsSwitchHandler()
             _exportButtonHandler()
+			_multiTabHandler()
         }
         const init = async () => {
             data = await window.utils.loadPreference()
