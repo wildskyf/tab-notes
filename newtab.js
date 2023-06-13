@@ -22,6 +22,7 @@
     const $list = document.querySelector('#list')
     const $mode_switcher = document.querySelector('#mode-switcher')
     const $setting_gear = document.querySelector('#setting-icon')
+	const $credits_button = document.querySelector("#addon-author")
     const $status = document.querySelector('#status')
     const $create_entry = document.querySelector('#create_entry')
     const $undo_deletion = document.querySelector("#undo_deletion")
@@ -31,8 +32,11 @@
     let undostack = []
 
 	$textarea.addEventListener("paste", function (event) {
-		event.preventDefault();
-		document.execCommand("inserttext", false, event.clipboardData.getData("text/plain"));
+		console.log(event.clipboardData.getData("text/plain"))
+		if (event.clipboardData.getData("text/plain") !== "") {
+			event.preventDefault();
+			document.execCommand("inserttext", false, event.clipboardData.getData("text/plain"));
+		}
 	})
 
     const _emptyNote = () => {
@@ -41,8 +45,6 @@
       emptyNote.time = (new Date()).getTime()
       return emptyNote
     }
-
-    
 
     const _render = (rendernote) => {
       const _renderList = list => {
@@ -91,7 +93,6 @@
               return
             }
             else if (event.target.classList.contains('dnld') || event.target.classList.contains('dnldimg')) {
-              //console.log("download");
               currentNoteId = index
               _render(true)
               const noteTitle = _makeTitleString(list[index].content)
@@ -204,6 +205,9 @@
     }
 
     const _renderTheme = () => {
+	  $textarea.style.fontFamily = data.font
+	  $textarea.style.fontSize = data.fontsize+"px"
+	  $textarea.style.lineHeight = data.fontsize*1.5+"px"
       if (data.mode == THEMES.night) {
         $body.classList.add('dark')
         $textarea.classList.add('dark')
@@ -214,6 +218,7 @@
         $textarea.classList.remove('dark')
         $list.classList.remove('dark')
       }
+	  $credits_button.hidden = !data.showcredits
     }
 
     const _themeSwitchHandler = () => {

@@ -55,8 +55,8 @@ body.dark #annoucement a { color: #fff; }
   box-sizing: border-box;
   border: 0;
   font-size: 18px;
-  font-family: monospace;
-  line-height: 1.75rem;
+  font-family: 'Roboto Mono', sans-serif;
+  line-height: 31.5px;
   margin: 0;
   height: 100vh;
   padding: 4rem 20%;

@@ -8,29 +8,54 @@
             night: "night",
             day: "day"
         }
+		const FONTS = {
+			monospace: "monospace",
+			roboto: "Roboto",
+			robotomono: "Roboto Mono",
+			lora: "Lora"
+		}
+		const FONTSIZE = {
+			tiny: 8,
+			small: 12,
+			default: 18,
+			large: 30,
+			huge: 50
+		}
         $font_selector = document.querySelector("#font-selector")
+		$font_size_selector = document.querySelector("#font-size-selector")
         $export_button = document.querySelector("#export-button")
         $dark_mode_switch = document.querySelector("#dark-mode-toggle")
+		$credits_switch = document.querySelector("#credits-toggle")
         $body = document.querySelector("body")
 
         let data = null
 
         const _fillSettings = () => {
             _renderTheme()
+			$font_selector.querySelector("#"+Object.keys(FONTS).find(key => FONTS[key] === data.font)).checked = true
+			$font_size_selector.querySelector("#"+Object.keys(FONTSIZE).find(key => FONTSIZE[key] === data.fontsize)).checked = true
             $dark_mode_switch.checked = data.mode === THEMES.night
-            console.log(data.mode === THEMES.night);
+			$credits_switch.checked = data.showcredits
         }
 
-        const _fontSizeHandler = () => {
+        const _fontHandler = () => {
             $font_selector.addEventListener('click', event => {
                 if ( event.target && event.target.matches("input[type='radio']") ) {
-                    //data.fontSize = event.target.value
-                    browser.storage.local.set({ font_size: data.fontSize })
+					data.font = FONTS[event.target.value]
+                    browser.storage.local.set({ font: data.font })
                 }
             })
         }
         
-        //if you swithc to dark mode in the notes tab, the settings tab should go dark too
+		const _fontSizeHandler = () => {
+			$font_size_selector.addEventListener('click', event => {
+				if ( event.target && event.target.matches("input[type='radio']") ) {
+					data.fontsize = FONTSIZE[event.target.value]
+                    browser.storage.local.set({ fontsize: data.fontsize })
+                }
+			})
+		}
+
         const _darkModeSwitchHandler = () => {
             $dark_mode_switch.addEventListener('click', event => {
               $body.classList.toggle('dark')
@@ -42,6 +67,14 @@
               _renderTheme()
             })
         }
+
+		const _creditsSwitchHandler = () => {
+			$credits_switch.addEventListener('click', event => {
+				data.showcredits = data.showcredits === true ? false : true
+				browser.storage.local.set({ showcredits: data.showcredits })
+				_renderTheme()
+			})
+		}
 
         const _exportButtonHandler = () => {
             $export_button.addEventListener('click', event => {
@@ -63,8 +96,10 @@
         }
 
         const _initEventHandler = () => {
-            _fontSizeHandler()
+            _fontHandler()
+			_fontSizeHandler()
             _darkModeSwitchHandler()
+			_creditsSwitchHandler()
             _exportButtonHandler()
         }
         const init = async () => {
