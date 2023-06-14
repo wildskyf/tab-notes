@@ -35,6 +35,7 @@
             _renderTheme()
 			$font_selector.querySelector("#"+Object.keys(FONTS).find(key => FONTS[key] === data.font)).checked = true
 			$font_size_selector.querySelector("#"+Object.keys(FONTSIZE).find(key => FONTSIZE[key] === data.fontsize)).checked = true
+			$dark_toggle_on_notes_switch.checked = data.darktoggleonnotes
             $dark_mode_switch.checked = data.mode === THEMES.night
 			$credits_switch.checked = data.showcredits
         }
