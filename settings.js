@@ -24,6 +24,7 @@
         $font_selector = document.querySelector("#font-selector")
 		$font_size_selector = document.querySelector("#font-size-selector")
         $export_button = document.querySelector("#export-button")
+		$clickable_links_switch = document.querySelector("#clickable-links-toggle")
         $dark_mode_switch = document.querySelector("#dark-mode-toggle")
 		$dark_toggle_on_notes_switch = document.querySelector("#dark-toggle-on-notes-toggle")
 		$credits_switch = document.querySelector("#credits-toggle")
@@ -35,6 +36,7 @@
             _renderTheme()
 			$font_selector.querySelector("#"+Object.keys(FONTS).find(key => FONTS[key] === data.font)).checked = true
 			$font_size_selector.querySelector("#"+Object.keys(FONTSIZE).find(key => FONTSIZE[key] === data.fontsize)).checked = true
+			$clickable_links_switch.checked = data.clickablelinks
 			$dark_toggle_on_notes_switch.checked = data.darktoggleonnotes
             $dark_mode_switch.checked = data.mode === THEMES.night
 			$credits_switch.checked = data.showcredits
@@ -55,6 +57,13 @@
 					data.fontsize = FONTSIZE[event.target.value]
                     browser.storage.local.set({ fontsize: data.fontsize })
                 }
+			})
+		}
+
+		const _clickableLinksSwitchHandler = () => {
+			$clickable_links_switch.addEventListener('click', event => {
+				data.clickablelinks = data.clickablelinks === true ? false : true
+				browser.storage.local.set({ clickablelinks: data.clickablelinks })
 			})
 		}
 
@@ -118,6 +127,7 @@
         const _initEventHandler = () => {
             _fontHandler()
 			_fontSizeHandler()
+			_clickableLinksSwitchHandler()
             _darkModeSwitchHandler()
 			_darkToggleOnNotesHandler()
 			_creditsSwitchHandler()

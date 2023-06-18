@@ -31,13 +31,35 @@
     let data = null
     let undostack = []
 
+	//paste text in plaintext, still allow pasting images
 	$textarea.addEventListener("paste", function (event) {
-		console.log(event.clipboardData.getData("text/plain"))
 		if (event.clipboardData.getData("text/plain") !== "") {
 			event.preventDefault();
 			document.execCommand("inserttext", false, event.clipboardData.getData("text/plain"));
 		}
 	})
+
+	//click links with ctrl+click
+	$textarea.addEventListener("click", function(event) {
+		if (data.clickablelinks && event.ctrlKey) {
+			var link = clickedword()
+			try {
+				url = new URL(link);
+				window.open(url)
+			} catch (_) {
+				console.log(link + " is an invalid link.")  
+			}
+		}
+	})
+
+	function clickedword() {
+		var sel = document.getSelection();
+		sel.modify("extend", "backward", "paragraphboundary");
+		var pos = sel.toString().length;
+		if(sel.anchorNode != undefined) sel.collapseToEnd();
+		var fullstr = sel.focusNode.textContent
+		return fullstr.substring(fullstr.lastIndexOf(' ', pos)+1, fullstr.indexOf(' ', pos) >= pos ? fullstr.indexOf(' ', pos) : fullstr.length)
+	}
 
     const _emptyNote = () => {
       const emptyNote = Object.create(null)
