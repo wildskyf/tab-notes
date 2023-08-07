@@ -21,14 +21,17 @@
 			large: 30,
 			huge: 50
 		}
-        $font_selector = document.querySelector("#font-selector")
-		$font_size_selector = document.querySelector("#font-size-selector")
-        $export_button = document.querySelector("#export-button")
-		$clickable_links_switch = document.querySelector("#clickable-links-toggle")
-        $dark_mode_switch = document.querySelector("#dark-mode-toggle")
-		$dark_toggle_on_notes_switch = document.querySelector("#dark-toggle-on-notes-toggle")
-		$credits_switch = document.querySelector("#credits-toggle")
-        $body = document.querySelector("body")
+        $font_selector = 				document.querySelector("#font-selector")
+		$font_size_selector = 			document.querySelector("#font-size-selector")
+        $export_button = 				document.querySelector("#export-button")
+		$import_button = 				document.querySelector("#import-button")
+		$clickable_links_switch = 		document.querySelector("#clickable-links-toggle")
+        $dark_mode_switch = 			document.querySelector("#dark-mode-toggle")
+		$dark_toggle_on_notes_switch = 	document.querySelector("#dark-toggle-on-notes-toggle")
+		$credits_switch = 				document.querySelector("#credits-toggle")
+		$pat_update_button = 			document.querySelector("#pat-update-button")
+		$sync_status = 					document.querySelector("#sync-status")
+        $body = 						document.querySelector("body")
 
         let data = null
 
@@ -101,6 +104,20 @@
             })
         }
 
+		const _importButtonHandler = () => {
+			$import_button.addEventListener('click', event => {
+				window.open('import.html');
+			})
+		}
+
+		const _patUpdateButtonHandler = () => {
+			$pat_update_button.addEventListener('click', event => {
+				if (confirm("This will save your GitHub personal access token in the browser's local storage. If a bad actor gets access to your PC e.g. by using a virus, they could access your personal access token. However, this data is safe from any website related attacks because it only exists purely locally on your PC.\n\nI'm not responsible for any damages that may occur. By clicking OK you confirm that you've read and accept these terms and conditions.")) {
+					console.log("nice")
+				}
+			})
+		}
+
         const _renderTheme = () => {
             if (data.mode == THEMES.night) {
               $body.classList.add('dark')
@@ -132,6 +149,8 @@
 			_darkToggleOnNotesHandler()
 			_creditsSwitchHandler()
             _exportButtonHandler()
+			_importButtonHandler()
+			_patUpdateButtonHandler()
 			_multiTabHandler()
         }
         const init = async () => {

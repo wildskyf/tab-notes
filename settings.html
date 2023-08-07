@@ -101,10 +101,28 @@
 
     <hr>
 
+	<p>
+		<div>
+			<label class="switch-label" for="login-button">GitHub personal access to token to sync your notes</label>
+			<div style="display: inline;">
+				<input class="button" type="button" value="Update" id="pat-update-button">
+				<input class="textfield" type="password" placeholder="Personal access token..." id="pat-field">
+			</div>
+		</div>
+		<div>
+			<label class="switch-label">Sync status: loading...</label>
+		</div>
+	</p>
+
+	<hr>
+
     <p>
         <div>
-            <label class="switch-label" for="export-button">Export notes</label>
-            <input class="button" type="button" value="Export" id="export-button">
+            <label class="switch-label" for="export-button">Export/import notes</label>
+			<div style="display: inline;">
+				<input class="button" type="button" value="Export" id="export-button">
+				<input class="button" type="button" value="Import" id="import-button">
+			</div>
         </div>
     </p>
 </body>

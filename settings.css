@@ -149,6 +149,11 @@ input:checked + .slider:before {
     margin-left: 30px;
 }
 
+.sync-label {
+    float: right;
+    margin-right: 30px;
+}
+
 .button {
     background-color: #2196F3;
     cursor: pointer;
@@ -156,6 +161,20 @@ input:checked + .slider:before {
     color: white;
     padding: 5px 10px;
     text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    float: right;
+    margin-right: 30px;
+}
+
+.textfield {
+    background-color: #ffffff;
+    border: 1px;
+	border-style: solid;
+    color: rgb(0, 0, 0);
+    padding: 5px 10px;
+    text-align: left;
     text-decoration: none;
     font-size: 16px;
     border-radius: 5px;
