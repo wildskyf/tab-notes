@@ -21,17 +21,18 @@
 			large: 30,
 			huge: 50
 		}
-        $font_selector = 				document.querySelector("#font-selector")
-		$font_size_selector = 			document.querySelector("#font-size-selector")
-        $export_button = 				document.querySelector("#export-button")
-		$import_button = 				document.querySelector("#import-button")
+        $font_selector =				document.querySelector("#font-selector")
+		$font_size_selector =			document.querySelector("#font-size-selector")
+        $export_button =				document.querySelector("#export-button")
+		$import_button =				document.querySelector("#import-button")
 		$clickable_links_switch = 		document.querySelector("#clickable-links-toggle")
-        $dark_mode_switch = 			document.querySelector("#dark-mode-toggle")
-		$dark_toggle_on_notes_switch = 	document.querySelector("#dark-toggle-on-notes-toggle")
-		$credits_switch = 				document.querySelector("#credits-toggle")
-		$pat_update_button = 			document.querySelector("#pat-update-button")
-		$sync_status = 					document.querySelector("#sync-status")
-        $body = 						document.querySelector("body")
+        $dark_mode_switch =				document.querySelector("#dark-mode-toggle")
+		$dark_toggle_on_notes_switch =	document.querySelector("#dark-toggle-on-notes-toggle")
+		$credits_switch =				document.querySelector("#credits-toggle")
+		$pat_textfield =				document.querySelector("#pat-field")
+		$pat_update_button =			document.querySelector("#pat-update-button")
+		$sync_status =					document.querySelector("#sync-status")
+        $body =							document.querySelector("body")
 
         let data = null
 
@@ -113,7 +114,15 @@
 		const _patUpdateButtonHandler = () => {
 			$pat_update_button.addEventListener('click', event => {
 				if (confirm("This will save your GitHub personal access token in the browser's local storage. If a bad actor gets access to your PC e.g. by using a virus, they could access your personal access token. However, this data is safe from any website related attacks because it only exists purely locally on your PC.\n\nI'm not responsible for any damages that may occur. By clicking OK you confirm that you've read and accept these terms and conditions.")) {
-					console.log("nice")
+					//I named it map instead of pat, so any malware that auto collects personal access tokens might have more difficulty finding the personal access token
+					data.map = $pat_textfield.value
+					browser.storage.local.set({ map: data.map })
+					request('GET /gists/{gist_id}', {
+						gist_id: '166332fd77082387d86f397acdbfc121',
+						headers: {
+						  'X-GitHub-Api-Version': '2022-11-28'
+						}
+					})
 				}
 			})
 		}

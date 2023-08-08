@@ -274,6 +274,7 @@
         }
 
         data = await window.utils.loadPreference()
+		console.log(data)
         _render(true)
         _renderTheme()
       }
