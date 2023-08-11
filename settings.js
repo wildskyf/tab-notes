@@ -117,7 +117,8 @@
 					//I named it map instead of pat, so any malware that auto collects personal access tokens might have more difficulty finding the personal access token
 					data.map = $pat_textfield.value
 					browser.storage.local.set({ map: data.map })
-					const response = await fetch(`https://api.github.com/gists/166332fd77082387d86f397acdbfc121`, {
+					//check if user has notes.html in their github gists
+					const response = await fetch(`https://api.github.com/gists`, {
 						method: "GET",
 						headers: {
 							Accept: "application/vnd.github+json",
@@ -125,7 +126,18 @@
 						},
 					});
 					const out = await response.json();
-					console.log(out.html_url);
+					const fileslst = out.map((i) => Object.values(i.files)).map((i) => i[0].filename);
+					if (fileslst.contains("notes.html")) {
+						const response = await fetch(`https://api.github.com/gists/166332fd77082387d86f397acdbfc121`, {
+							method: "GET",
+							headers: {
+								Accept: "application/vnd.github+json",
+								Authorization: `Bearer ${data.map}`,
+							},
+						});
+						const out = await response.json();
+						console.log(out.files["notes.html"].content);
+					}
 				}
 			})
 		}
