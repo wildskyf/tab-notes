@@ -112,17 +112,20 @@
 		}
 
 		const _patUpdateButtonHandler = () => {
-			$pat_update_button.addEventListener('click', event => {
+			$pat_update_button.addEventListener('click', async event => {
 				if (confirm("This will save your GitHub personal access token in the browser's local storage. If a bad actor gets access to your PC e.g. by using a virus, they could access your personal access token. However, this data is safe from any website related attacks because it only exists purely locally on your PC.\n\nI'm not responsible for any damages that may occur. By clicking OK you confirm that you've read and accept these terms and conditions.")) {
 					//I named it map instead of pat, so any malware that auto collects personal access tokens might have more difficulty finding the personal access token
 					data.map = $pat_textfield.value
 					browser.storage.local.set({ map: data.map })
-					request('GET /gists/{gist_id}', {
-						gist_id: '166332fd77082387d86f397acdbfc121',
+					const response = await fetch(`https://api.github.com/gists/166332fd77082387d86f397acdbfc121`, {
+						method: "GET",
 						headers: {
-						  'X-GitHub-Api-Version': '2022-11-28'
-						}
-					})
+							Accept: "application/vnd.github+json",
+							Authorization: `Bearer ${data.map}`,
+						},
+					});
+					const out = await response.json();
+					console.log(out.html_url);
 				}
 			})
 		}
