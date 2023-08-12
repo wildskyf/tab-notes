@@ -117,7 +117,8 @@
 					//I named it map instead of pat, so any malware that auto collects personal access tokens might have more difficulty finding the personal access token
 					data.map = $pat_textfield.value
 					browser.storage.local.set({ map: data.map })
-					//check if user has notes.html in their github gists
+					//check if user has tab-notes.html in their github gists
+					//TODO: error handling
 					const response = await fetch(`https://api.github.com/gists`, {
 						method: "GET",
 						headers: {
@@ -126,20 +127,33 @@
 						},
 					});
 					const out = await response.json();
-					const fileslst = out.map((i) => Object.values(i.files)).map((i) => i[0].filename);
-					if (fileslst.contains("notes.html")) {
-						const response = await fetch(`https://api.github.com/gists/166332fd77082387d86f397acdbfc121`, {
-							method: "GET",
-							headers: {
-								Accept: "application/vnd.github+json",
-								Authorization: `Bearer ${data.map}`,
-							},
-						});
-						const out = await response.json();
-						console.log(out.files["notes.html"].content);
+					const rawurl = out.map((i) => Object.values(i.files)).reduce((a, c) => a = c[0].filename == "tab-notes.html" ? c[0].raw_url : a, undefined)
+					console.log(rawurl)
+					var notecontent;
+					if (rawurl != undefined) {
+						const response = await fetch(rawurl, {
+						method: "GET",
+						headers: {
+							Accept: "text/html",
+							//Authorization: `Bearer ${data.map}`,
+						}});
+						notecontent = await response.text();
+					} else {
+						_initGist()
+					}
+					//all successful, now replacing current text with what's in the gist
+					console.log("Link to the gist content: " + rawurl);
+					if (confirm(`A gist named \"tab-notes.html\" was detected on your GitHub account. All of your notes will be replaced with the contents of this gist (a link to the gist content can be found in the devtools by pressing F12).\n\nPress OK if you want to continue.`)) {
+						console.log(notecontent)
+						//replace notes content
 					}
 				}
 			})
+		}
+
+		//make a notes.html gist and fill it with the current note content
+		const _initGist = () => {
+
 		}
 
         const _renderTheme = () => {
