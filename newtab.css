@@ -95,10 +95,10 @@ input.larger {
 .dark + #mode-switcher { background: #fff; }
 
 #status {
-  bottom: 12px;
+  bottom: 15px;
   filter: invert(100%);
   position: fixed;
-  left: 12px;
+  left: 35px;
 }
 
 #addon-author {

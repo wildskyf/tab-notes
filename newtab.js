@@ -1,5 +1,6 @@
 ;(() => {
-  
+  //TODO: fix 1 frame of white screen when starting the app
+
   // FIXME: Should use uuid instead of index as key for storage
   /** DB
     * {
@@ -30,6 +31,8 @@
     let currentNoteId = 0
     let data = null
     let undostack = []
+
+	let hide_timeout = null
 
 	//paste text in plaintext, still allow pasting images
 	$textarea.addEventListener("paste", function (event) {
@@ -171,33 +174,61 @@
     }
 
     const _noteEventHandler = () => {
-      // auto saving and indicator
-      let write_timeout, saved_timeout
+      // auto saving and indicator, also a save timeout so you can't exceed GitHub's rate limits
+      let write_timeout, save_timeout;
+	  let timed_out = false, buffered = false;
       $textarea.addEventListener('keyup', () => {
         //if note didnt change
         if (data.list[currentNoteId].content === $textarea.innerHTML) { return }
+
+		const _saveNote = async () => {
+			data.list[currentNoteId].content = $textarea.innerHTML
+			data.list[currentNoteId].time = (new Date()).getTime()
+			currentNoteId = 0
+			browser.storage.local.set({ list: data.list })
+			//save to gist
+			//TODO: error handling
+			const response = await fetch(`https://api.github.com/gists/${data.gistid}`, {
+				method: "PATCH",
+				headers: {
+					Accept: "application/vnd.github+json",
+					Authorization: `Bearer ${data.map}`,
+				},
+				body: JSON.stringify({
+					description: `Gist to sync your tab-notes data. Last updated at: ${new Date().toLocaleString()}`,
+					//TODO: check if the filter and join are needed
+					files: {"tab-notes.html": {content: data.list.map(note => `${note.content}\n\n<<${note.time}>>\n\n`).filter(c => c).join('')}}
+				})});
+			const out = await response.json()
+
+			$status.classList.remove('hide')
+			$status.textContent = 'Saved and synced.'
+			//$status.textContent = 'Saved locally.'
+			clearTimeout(hide_timeout)
+			_render(false);
+		
+			hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
+		}
 
         $status.classList.remove('hide')
         $status.textContent = 'Saving...'
 
         clearTimeout(write_timeout)
         write_timeout = setTimeout(() => {
-          const _renderStatusDone = () => {
-            $status.classList.remove('hide')
-            $status.textContent = 'Saved.'
-          }
-
-          data.list[currentNoteId].content = $textarea.innerHTML
-          data.list[currentNoteId].time = (new Date()).getTime()
-          currentNoteId = 0
-          browser.storage.local.set({ list: data.list })
-          _renderStatusDone()
-          clearTimeout(saved_timeout)
-          //remove render, because I directly edit the innerHTML, and if it attempts to render, it'll reset the caret position
-          //TODO: the sidebar does need to be rerendered
-          _render(false);
-        
-          saved_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
+			if (!timed_out) {
+				_saveNote()
+				timed_out = true
+				save_timeout = setTimeout(() => {
+					save_timeout = false
+					if (buffered) {
+						buffered = false
+						_saveNote()
+					}
+				}, 5000)
+			} else {
+				buffered = true
+				clearTimeout(hide_timeout)
+			}
         }, 250)
       })
       $textarea.focus()
@@ -274,7 +305,6 @@
         }
 
         data = await window.utils.loadPreference()
-		console.log(data)
         _render(true)
         _renderTheme()
       }
@@ -319,13 +349,42 @@
     }
 
     const init = async () => {
-      data = await window.utils.loadPreference()
+		data = await window.utils.loadPreference()
+		_render(false)
+		//if it's synced with github, then load the data
+		if (navigator.onLine && data.gistid != undefined) {
+			//TODO: errorhandler
+			const response = await fetch(`https://api.github.com/gists/${data.gistid}`, {
+				method: "GET",
+				headers: {
+					Accept: "application/vnd.github+json",
+					//Authorization: `Bearer ${data.map}`
+				}
+			});
+			out = await response.json();
+			notecontent = out.files["tab-notes.html"].content
+			
+			//replace notes content
+			var tmp = notecontent.split(/\n\n<<([0-9]+)>>\n\n/g).slice(0, -1)
+			var newnotes = []
+			for (var i = 0; i < tmp.length; i += 2) {
+				newnotes.push({content: tmp[i], time: parseInt(tmp[i+1])})
+			}
+			data.list = newnotes
+			browser.storage.local.set({ list: data.list })
 
-      _renderAnnoucement()
-      _render(true)
-      _renderTheme()
-      _initEventHandler()
-      _enableAnimation()
+			//add a "synced" text at the bottom
+			$status.classList.remove('hide')
+			$status.textContent = 'Synced.'
+			clearTimeout(hide_timeout)
+			hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
+		}
+
+		_renderAnnoucement()
+		_render(true)
+		_renderTheme()
+		_initEventHandler()
+		_enableAnimation()
     }
     
     return {

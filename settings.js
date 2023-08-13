@@ -123,37 +123,42 @@
 						method: "GET",
 						headers: {
 							Accept: "application/vnd.github+json",
-							Authorization: `Bearer ${data.map}`,
+							Authorization: `Bearer ${data.map}`
 						},
 					});
 					const out = await response.json();
-					const rawurl = out.map((i) => Object.values(i.files)).reduce((a, c) => a = c[0].filename == "tab-notes.html" ? c[0].raw_url : a, undefined)
-					console.log(rawurl)
-					var notecontent;
-					if (rawurl != undefined) {
-						const response = await fetch(rawurl, {
-						method: "GET",
-						headers: {
-							Accept: "text/html",
-							//Authorization: `Bearer ${data.map}`,
-						}});
-						notecontent = await response.text();
+					//perhaps not very performant, but it works
+					data.gistid = out.reduce((a, c) => a = Object.values(c.files)[0].filename == "tab-notes.html" ? c.id : a, undefined)
+					browser.storage.local.set({ gistid: data.gistid })
+					var notecontent
+					if (data.gistid != undefined) {
+						const response = await fetch(`https://api.github.com/gists/${data.gistid}`, {
+							method: "GET",
+							headers: {
+								Accept: "application/vnd.github+json",
+								//Authorization: `Bearer ${data.map}`
+							}
+						});
+						const out = await response.json();
+						notecontent = out.files["tab-notes.html"].content
+
+						//all successful, now replacing current text with what's in the gist
+						console.log(`Link to the gist content: https://api.github.com/gists/${data.gistid}`);
+						if (confirm(`A gist named \"tab-notes.html\" was detected on your GitHub account. All of your notes will be replaced with the contents of this gist (a link to the gist content can be found in the devtools by pressing F12).\n\nPress OK if you want to continue.`)) {
+							console.log(notecontent)
+							//replace notes content
+						}
 					} else {
 						_initGist()
 					}
-					//all successful, now replacing current text with what's in the gist
-					console.log("Link to the gist content: " + rawurl);
-					if (confirm(`A gist named \"tab-notes.html\" was detected on your GitHub account. All of your notes will be replaced with the contents of this gist (a link to the gist content can be found in the devtools by pressing F12).\n\nPress OK if you want to continue.`)) {
-						console.log(notecontent)
-						//replace notes content
-					}
+					
 				}
 			})
 		}
 
 		//make a notes.html gist and fill it with the current note content
 		const _initGist = () => {
-
+			console.log("TODO : initialize gist")
 		}
 
         const _renderTheme = () => {
