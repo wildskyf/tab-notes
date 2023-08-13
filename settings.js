@@ -215,6 +215,7 @@
               //$textarea.classList.remove('dark')
               //$list.classList.remove('dark')
             }
+			_syncStatusHandler()
         }
 
 		const _multiTabHandler = () => {
