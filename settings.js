@@ -118,47 +118,81 @@
 					data.map = $pat_textfield.value
 					browser.storage.local.set({ map: data.map })
 					//check if user has tab-notes.html in their github gists
-					//TODO: error handling
-					const response = await fetch(`https://api.github.com/gists`, {
+					fetch(`https://api.github.com/gists`, {
 						method: "GET",
 						headers: {
 							Accept: "application/vnd.github+json",
 							Authorization: `Bearer ${data.map}`
 						},
-					});
-					const out = await response.json();
-					//perhaps not very performant, but it works
-					data.gistid = out.reduce((a, c) => a = Object.values(c.files)[0].filename == "tab-notes.html" ? c.id : a, undefined)
-					browser.storage.local.set({ gistid: data.gistid })
-					var notecontent
-					if (data.gistid != undefined) {
-						const response = await fetch(`https://api.github.com/gists/${data.gistid}`, {
-							method: "GET",
-							headers: {
-								Accept: "application/vnd.github+json",
-								//Authorization: `Bearer ${data.map}`
-							}
-						});
-						const out = await response.json();
-						notecontent = out.files["tab-notes.html"].content
-
-						//all successful, now replacing current text with what's in the gist
-						console.log(`Link to the gist content: https://api.github.com/gists/${data.gistid}`);
-						if (confirm(`A gist named \"tab-notes.html\" was detected on your GitHub account. All of your notes will be replaced with the contents of this gist (a link to the gist content can be found in the devtools by pressing F12).\n\nPress OK if you want to continue.`)) {
-							console.log(notecontent)
-							//replace notes content
+					}).then(async response => {
+						if (!response.ok) {
+							return response.text().then(text => { throw new Error(text) })
 						}
-					} else {
-						_initGist()
-					}
-					
+						return response.json()
+					}).then(out => {
+						//perhaps not very performant, but it works
+						data.gistid = out.reduce((a, c) => a = Object.values(c.files)[0].filename == "tab-notes.html" ? c.id : a, undefined)
+						browser.storage.local.set({ gistid: data.gistid })
+						var notecontent
+						if (data.gistid != undefined) {
+							fetch(`https://api.github.com/gists/${data.gistid}`, {
+								method: "GET",
+								headers: {
+									Accept: "application/vnd.github+json",
+									//Authorization: `Bearer ${data.map}`
+								}
+							}).then(async response => {
+								if (!response.ok) {
+									return response.text().then(text => { throw new Error(text) })
+								}
+								return response.json()
+							}).then(out => {
+								notecontent = out.files["tab-notes.html"].content
+								//all successful, now replacing current text with what's in the gist
+								console.log(`Link to the gist content: https://api.github.com/gists/${data.gistid}`);
+								if (confirm(`A gist named \"tab-notes.html\" was detected on your GitHub account. All of your notes will be replaced with the contents of this gist (a link to the gist content can be found in the devtools by pressing F12).\n\nPress OK if you want to continue.`)) {
+									//replace notes content
+									var tmp = notecontent.split(/\n\n<<([0-9]+)>>\n\n/g).slice(0, -1)
+									var newnotes = []
+									for (var i = 0; i < tmp.length; i += 2) {
+										newnotes.push({content: tmp[i], time: parseInt(tmp[i+1])})
+									}
+									data.list = newnotes
+									browser.storage.local.set({ list: data.list })
+								}
+							}).catch(error => {
+								alert(`An error has occured. A \"tab-notes.html\" gist was found, but couldn't be loaded: ${error}`)
+							})
+						} else {
+							alert("Couldn't find a \"tab-notes.html\" gist on your GitHub account. Please make one and fill it with your exported notes.")
+						}
+					}).catch(error => {
+						alert(`An error has occured. The personal access token you entered might be incorrect: ${error}`)
+					})
+					_syncStatusHandler()
 				}
 			})
 		}
 
-		//make a notes.html gist and fill it with the current note content
-		const _initGist = () => {
-			console.log("TODO : initialize gist")
+		const _syncStatusHandler = () => {
+			if (data.map != undefined) {
+				fetch(`https://api.github.com/gists`, {
+					method: "GET",
+					headers: {
+						Accept: "application/vnd.github+json",
+						Authorization: `Bearer ${data.map}`
+					},
+				}).then(async response => {
+					if (!response.ok) {
+						return response.text().then(text => { throw new Error(text) })
+					}
+					$sync_status.innerHTML = "Sync status: synced successfully"
+				}).catch(error => {
+					$sync_status.innerHTML = "Sync status: not synced"
+				})
+			} else {
+				$sync_status.innerHTML = "Sync status: not synced"
+			}
 		}
 
         const _renderTheme = () => {
@@ -193,6 +227,7 @@
 			_creditsSwitchHandler()
             _exportButtonHandler()
 			_importButtonHandler()
+			_syncStatusHandler()
 			_patUpdateButtonHandler()
 			_multiTabHandler()
         }

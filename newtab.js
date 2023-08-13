@@ -187,23 +187,37 @@
 			currentNoteId = 0
 			browser.storage.local.set({ list: data.list })
 			//save to gist
-			//TODO: error handling
-			const response = await fetch(`https://api.github.com/gists/${data.gistid}`, {
-				method: "PATCH",
-				headers: {
-					Accept: "application/vnd.github+json",
-					Authorization: `Bearer ${data.map}`,
-				},
-				body: JSON.stringify({
-					description: `Gist to sync your tab-notes data. Last updated at: ${new Date().toLocaleString()}`,
-					//TODO: check if the filter and join are needed
-					files: {"tab-notes.html": {content: data.list.map(note => `${note.content}\n\n<<${note.time}>>\n\n`).filter(c => c).join('')}}
-				})});
-			const out = await response.json()
-
-			$status.classList.remove('hide')
-			$status.textContent = 'Saved and synced.'
-			//$status.textContent = 'Saved locally.'
+			//TODO: fetch with timeout
+			if (navigator.onLine) {
+				fetch(`https://api.github.com/gists/${data.gistid}`, {
+					method: "PATCH",
+					headers: {
+						Accept: "application/vnd.github+json",
+						Authorization: `Bearer ${data.map}`,
+					},
+					body: JSON.stringify({
+						description: `Gist to sync your tab-notes data. Last updated at: ${new Date().toLocaleString()}`,
+						//TODO: check if the filter and join are needed
+						files: {"tab-notes.html": {content: data.list.map(note => `${note.content}\n\n<<${note.time}>>\n\n`).filter(c => c).join('')}}
+					})
+				}).then(async response => {
+					if (!response.ok) {
+						return response.text().then(text => { throw new Error(text) })
+					}
+					return response.json()
+				}).then(out => {
+					$status.classList.remove('hide')
+					$status.textContent = 'Saved and synced.'
+				})
+				.catch(error => {
+					$status.classList.remove('hide')
+					$status.textContent = 'Saved locally.'
+					alert(`An error occured trying to upload the note to a GitHub gist: ${error}`)
+				})
+			} else {
+				$status.classList.remove('hide')
+				$status.textContent = 'Saved locally.'
+			}
 			clearTimeout(hide_timeout)
 			_render(false);
 		
@@ -350,34 +364,40 @@
 
     const init = async () => {
 		data = await window.utils.loadPreference()
-		_render(false)
+		_render(true)
 		//if it's synced with github, then load the data
 		if (navigator.onLine && data.gistid != undefined) {
-			//TODO: errorhandler
-			const response = await fetch(`https://api.github.com/gists/${data.gistid}`, {
+			fetch(`https://api.github.com/gists/${data.gistid}`, {
 				method: "GET",
 				headers: {
 					Accept: "application/vnd.github+json",
 					//Authorization: `Bearer ${data.map}`
 				}
-			});
-			out = await response.json();
-			notecontent = out.files["tab-notes.html"].content
+			}).then(async response => {
+				if (!response.ok) {
+					return response.text().then(text => { throw new Error(text) })
+				}
+				return response.json()
+			}).then(out => {
+				notecontent = out.files["tab-notes.html"].content
 			
-			//replace notes content
-			var tmp = notecontent.split(/\n\n<<([0-9]+)>>\n\n/g).slice(0, -1)
-			var newnotes = []
-			for (var i = 0; i < tmp.length; i += 2) {
-				newnotes.push({content: tmp[i], time: parseInt(tmp[i+1])})
-			}
-			data.list = newnotes
-			browser.storage.local.set({ list: data.list })
+				//replace notes content
+				var tmp = notecontent.split(/\n\n<<([0-9]+)>>\n\n/g).slice(0, -1)
+				var newnotes = []
+				for (var i = 0; i < tmp.length; i += 2) {
+					newnotes.push({content: tmp[i], time: parseInt(tmp[i+1])})
+				}
+				data.list = newnotes
+				browser.storage.local.set({ list: data.list })
 
-			//add a "synced" text at the bottom
-			$status.classList.remove('hide')
-			$status.textContent = 'Synced.'
-			clearTimeout(hide_timeout)
-			hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
+				//add a "synced" text at the bottom
+				$status.classList.remove('hide')
+				$status.textContent = 'Synced.'
+				clearTimeout(hide_timeout)
+				hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
+			}).catch(error => {
+				alert(`An error occured trying to load the note content: ${error}`)
+			})
 		}
 
 		_renderAnnoucement()
