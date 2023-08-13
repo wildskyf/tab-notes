@@ -2,7 +2,6 @@
     //add event listener to every input
     //save to storage
     //make sure every tab notes page gets updated when switching to that tab
-	//TODO: dark mode toggle on tab note page, and dark mode toggle in settings page can get desynced. The toggle on note page doesn't update the settings button.
 
     const settings_script = () => {
         const THEMES = {
@@ -206,11 +205,13 @@
         const _renderTheme = () => {
             if (data.mode == THEMES.night) {
               $body.classList.add('dark')
+			  $dark_mode_switch.checked = true
               //$textarea.classList.add('dark')
               //$list.classList.add('dark')
             }
             else {
               $body.classList.remove('dark')
+			  $dark_mode_switch.checked = false
               //$textarea.classList.remove('dark')
               //$list.classList.remove('dark')
             }

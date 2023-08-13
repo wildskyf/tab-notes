@@ -11,6 +11,7 @@ body {
     resize: none;
     width: 100%;
     vertical-align: middle;
+	transition-duration: .3s;
 }
 
 body.dark {
