@@ -1,6 +1,5 @@
 ;(() => {
-  //TODO: fix 1 frame of white screen when starting the app
-
+	
   // FIXME: Should use uuid instead of index as key for storage
   /** DB
     * {
@@ -187,7 +186,6 @@
 			currentNoteId = 0
 			browser.storage.local.set({ list: data.list })
 			//save to gist
-			//TODO: fetch with timeout
 			if (navigator.onLine) {
 				fetch(`https://api.github.com/gists/${data.gistid}`, {
 					method: "PATCH",
@@ -197,7 +195,6 @@
 					},
 					body: JSON.stringify({
 						description: `Gist to sync your tab-notes data. Last updated at: ${new Date().toLocaleString()}`,
-						//TODO: check if the filter and join are needed
 						files: {"tab-notes.html": {content: data.list.map(note => `${note.content}\n\n<<${note.time}>>\n\n`).filter(c => c).join('')}}
 					})
 				}).then(async response => {
@@ -359,12 +356,11 @@
       }
 
       $migrate_btn.addEventListener('click', migrateBtnOnClick)
-
     }
 
-    const init = async () => {
-		data = await window.utils.loadPreference()
-		_render(true)
+	const _syncNotes = () => {
+		//TODO: if you worked in offline mode, first sync local changes to server, and don't overwrite local changes with server contents
+		//TODO: also add on the fly disconnecting and connecting to the internet (using timeoutable fetches, and periodic checking of the gist when offline)
 		//if it's synced with github, then load the data
 		if (navigator.onLine && data.gistid != undefined) {
 			fetch(`https://api.github.com/gists/${data.gistid}`, {
@@ -399,7 +395,13 @@
 				alert(`An error occured trying to load the note content: ${error}`)
 			})
 		}
+	}
 
+    const init = async () => {
+		data = await window.utils.loadPreference()
+		//render instantly so screen doesn't stay white
+		_render(true)
+		_syncNotes()
 		_renderAnnoucement()
 		_render(true)
 		_renderTheme()
