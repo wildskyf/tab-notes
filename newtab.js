@@ -71,6 +71,7 @@
     }
 
     const _render = (rendernote) => {
+	  $body.style.backgroundColor = "#ffffff"
       const _renderList = list => {
         const _makeTitleString = content => content.substr(0, 50).replace(/<.*?>/g, '').replace(/[^A-Za-z0-9 ]/g, '').substr(0, 10) || '<span class="empty-string">(EMPTY)</span>'
         const $ul = document.querySelector('ul')

@@ -2,6 +2,7 @@
     //add event listener to every input
     //save to storage
     //make sure every tab notes page gets updated when switching to that tab
+	//TODO: dark mode toggle on tab note page, and dark mode toggle in settings page can get desynced. The toggle on note page doesn't update the settings button.
 
     const settings_script = () => {
         const THEMES = {
@@ -31,6 +32,7 @@
 		$credits_switch =				document.querySelector("#credits-toggle")
 		$pat_textfield =				document.querySelector("#pat-field")
 		$pat_update_button =			document.querySelector("#pat-update-button")
+		$pat_help_button =				document.querySelector("#pat-help-button")
 		$sync_status =					document.querySelector("#sync-status")
         $body =							document.querySelector("body")
 
@@ -174,6 +176,12 @@
 			})
 		}
 
+		const _patHelpButtonHandler = () => {
+			$pat_help_button.addEventListener('click', event => {
+				alert("To sync extensions across multiple devices, generate a personal access token on GitHub with the \"gist\" scope, and enter this personal access token in the input field, then press update.")
+			})
+		}
+
 		const _syncStatusHandler = () => {
 			if (data.map != undefined) {
 				fetch(`https://api.github.com/gists`, {
@@ -229,6 +237,7 @@
 			_importButtonHandler()
 			_syncStatusHandler()
 			_patUpdateButtonHandler()
+			_patHelpButtonHandler()
 			_multiTabHandler()
         }
         const init = async () => {
