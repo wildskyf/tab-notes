@@ -278,11 +278,13 @@
         $body.classList.add('dark')
         $textarea.classList.add('dark')
         $list.classList.add('dark')
+		$setting_gear.classList.add('dark')
       }
       else {
         $body.classList.remove('dark')
         $textarea.classList.remove('dark')
         $list.classList.remove('dark')
+		$setting_gear.classList.remove('dark')
       }
 	  $mode_switcher.hidden = !data.darktoggleonnotes
 	  $credits_button.hidden = !data.showcredits

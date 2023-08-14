@@ -95,10 +95,16 @@ input.larger {
 .dark + #mode-switcher { background: #fff; }
 
 #status {
+  color: #fff;
   bottom: 15px;
   filter: invert(100%);
   position: fixed;
   left: 35px;
+}
+
+.dark #status {
+	color: #343434;
+	
 }
 
 #addon-author {
@@ -327,8 +333,8 @@ input.larger {
 }
 
 #setting-icon {
-  background: white;
-  border: 0.2857142857em solid gray;
+  background: #fff;
+  border: 0.2857142857em solid #343434;
   display: inline-block;
   position: relative;
   margin: 0.2em;
@@ -341,11 +347,12 @@ input.larger {
 }
 
 .dark #setting-icon {
-  background: #343434;
+	background: #343434;
+    border: 0.2857142857em solid #fff;
 }
 
 #setting-icon:before, #setting-icon:after {
-  color: gray;
+  color: #343434;
   content: "×";
   position: absolute;
   z-index: -1;
@@ -358,6 +365,14 @@ input.larger {
 }
 #setting-icon:after {
   transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.dark #setting-icon:before {
+	color: #fff;
+}
+
+.dark #setting-icon:after {
+	color: #fff;
 }
 
 /* width */
