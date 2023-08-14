@@ -210,7 +210,6 @@
 			browser.storage.local.set({ list: data.list })
 
 			//save to gist
-			console.log("startfetch")
 			fetch(`https://api.github.com/gists/${data.gistid}`, {
 				method: "PATCH",
 				headers: {
@@ -455,11 +454,13 @@
 				browser.storage.local.set({ offline: data.offline })
 				_attemptConnection()
 			})
-		} else if (data.gist != undefined) {
+		} else if (data.gistid != undefined) {
 			data.offline = true
 			browser.storage.local.set({ offline: data.offline })
 			console.log(`Couldn't load note content because you're offline`)
 			_attemptConnection()
+		} else {
+			console.log("Can't sync notes, because you haven't configured your settings yet.")
 		}
 	}
 
