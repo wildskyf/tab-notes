@@ -244,9 +244,10 @@
         }
         const init = async () => {
             data = await window.utils.loadPreference()
-
+			
             _initEventHandler()
             _fillSettings()
+			setTimeout(() => {$body.style.transitionDuration = ".3s"}, 300)
         }
         return {
             init: init
