@@ -381,15 +381,35 @@ input.larger {
 
 /* Track */
 #note-content::-webkit-scrollbar-track {
-  background: #9e9e9e3d;
+  background: #9e9e9e17;
 }
 
 /* Handle */
 #note-content::-webkit-scrollbar-thumb {
-  background: #8888888c;
+  background: #8888885b;
 }
 
 /* Handle on hover */
 #note-content::-webkit-scrollbar-thumb:hover {
-  background: #5555558c;
+  background: #55555575;
+}
+
+/* width */
+#list::-webkit-scrollbar {
+  width: 10px;
+}
+  
+/* Track */
+#list::-webkit-scrollbar-track {
+  background: #9e9e9e17;
+}
+  
+/* Handle */
+#list::-webkit-scrollbar-thumb {
+  background: #8888885b;
+}
+  
+/* Handle on hover */
+#list::-webkit-scrollbar-thumb:hover {
+  background: #55555575;
 }

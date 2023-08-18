@@ -184,6 +184,7 @@
         $status.classList.remove('hide')
         $status.textContent = 'Saving...'
 
+		clearTimeout(hide_timeout)
         clearTimeout(write_timeout)
         write_timeout = setTimeout(() => {
 			if (!timed_out) {
@@ -198,11 +199,11 @@
 				}, 5000)
 			} else {
 				buffered = true
-				clearTimeout(hide_timeout)
 			}
         }, 250)
 
 		const _saveNote = async () => {
+			console.log("saving")
 			//save to local storage
 			data.list[currentNoteId].content = $textarea.innerHTML
 			data.list[currentNoteId].time = (new Date()).getTime()
