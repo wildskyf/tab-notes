@@ -1,7 +1,7 @@
 .hide { display: none !important; }
 
 body {
-  color: #343434;
+  background-color: #343434;
   padding: 0;
   margin: 0;
   overflow: hidden;
@@ -50,22 +50,36 @@ body.dark #annoucement > div:hover {
 }
 body.dark #annoucement a { color: #fff; }
 
+/*this is note textarea*/
 #note-content {
   box-sizing: border-box;
   border: 0;
   font-size: 18px;
-  line-height: 1.75rem;
+  font-family: 'Roboto Mono', sans-serif;
+  line-height: 31.5px;
   margin: 0;
-  min-height: 100vh;
-  height: auto;
+  height: 100vh;
   padding: 4rem 20%;
   resize: none;
   width: 100%;
+  vertical-align: middle;
+  overflow: auto;
 }
 #note-content.dark {
   background: #343434;
   color: #fff;
 }
+
+strong {
+  font-weight: bold;
+}
+
+input.larger {
+  height: 18px;
+  width: 18px;
+  margin: 0;
+}
+
 #mode-switcher {
   border: 1px solid #777;
   border-radius: 50%;
@@ -73,7 +87,7 @@ body.dark #annoucement a { color: #fff; }
   height: 20px;
   position: fixed;
   top: 12px;
-  right: 12px;
+  right: 22px;
   width: 20px;
   z-index: 999;
 }
@@ -81,10 +95,15 @@ body.dark #annoucement a { color: #fff; }
 .dark + #mode-switcher { background: #fff; }
 
 #status {
-  bottom: 12px;
-  filter: invert(100%);
+  color: #343434;
+  bottom: 15px;
+  /*filter: invert(100%);*/
   position: fixed;
-  left: 12px;
+  left: 35px;
+}
+
+.dark #status {
+	color: #ffffff;
 }
 
 #addon-author {
@@ -98,7 +117,7 @@ body.dark #annoucement a { color: #fff; }
   padding: 2px;
   position: fixed;
   text-decoration: none;
-  right: 12px;
+  right: 22px;
 }
 #addon-author:hover { background: #E28699; border-color: #E28699; }
 
@@ -162,6 +181,28 @@ body.dark #annoucement a { color: #fff; }
   border: 1px solid #777;
 }
 
+#undo_deletion {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  box-sizing: border-box;
+  width: 100px;
+  height: 22px;
+  color: #000;
+  background: #fff;
+  text-align: center;
+  line-height: 20px;
+  cursor: pointer;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+}
+
+.dark #undo_deletion {
+  background: #343434;
+  color: #aaa;
+  border: 1px solid #777;
+}
+
 #list ul {
   padding: 0 0 calc(20px + 1rem);
   margin: 0;
@@ -208,6 +249,33 @@ body.dark #annoucement a { color: #fff; }
   display: inline-block;
 }
 #list li:hover span .del:hover {
+  opacity: 1;
+}
+#list li span .dnld {
+  display: none;
+  position: absolute;
+  right: 20px;
+  cursor: pointer;
+  opacity: 0.5;
+  font-family: sans-serif;
+  font-size: 1.5rem;
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  line-height: 20px;
+  filter: invert(0);
+}
+#list.dark li span .dnld {
+  filter: invert(1);
+}
+#list li span .dnld img {
+  width: 65%;
+}
+#list li:hover span .dnld {
+  display: inline-block;
+}
+#list li:hover span .dnld:hover {
   opacity: 1;
 }
 #list .current {
@@ -264,8 +332,8 @@ body.dark #annoucement a { color: #fff; }
 }
 
 #setting-icon {
-  background: white;
-  border: 0.2857142857em solid gray;
+  background: #fff;
+  border: 0.2857142857em solid #343434;
   display: inline-block;
   position: relative;
   margin: 0.2em;
@@ -278,11 +346,12 @@ body.dark #annoucement a { color: #fff; }
 }
 
 .dark #setting-icon {
-  background: #343434;
+	background: #343434;
+    border: 0.2857142857em solid #fff;
 }
 
 #setting-icon:before, #setting-icon:after {
-  color: gray;
+  color: #343434;
   content: "×";
   position: absolute;
   z-index: -1;
@@ -295,4 +364,52 @@ body.dark #annoucement a { color: #fff; }
 }
 #setting-icon:after {
   transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.dark #setting-icon:before {
+	color: #fff;
+}
+
+.dark #setting-icon:after {
+	color: #fff;
+}
+
+/* width */
+#note-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+#note-content::-webkit-scrollbar-track {
+  background: #9e9e9e17;
+}
+
+/* Handle */
+#note-content::-webkit-scrollbar-thumb {
+  background: #8888885b;
+}
+
+/* Handle on hover */
+#note-content::-webkit-scrollbar-thumb:hover {
+  background: #55555575;
+}
+
+/* width */
+#list::-webkit-scrollbar {
+  width: 10px;
+}
+  
+/* Track */
+#list::-webkit-scrollbar-track {
+  background: #9e9e9e17;
+}
+  
+/* Handle */
+#list::-webkit-scrollbar-thumb {
+  background: #8888885b;
+}
+  
+/* Handle on hover */
+#list::-webkit-scrollbar-thumb:hover {
+  background: #55555575;
 }
