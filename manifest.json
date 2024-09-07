@@ -21,9 +21,6 @@
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },
-  "web_accessible_resources": [
-	"https://esm.sh/@octokit/request.js/"
-  ],
 
   "browser_action": {
     "browser_style": true,
