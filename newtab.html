@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <link type="image/x-icon" href="./favicon.ico" rel="icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora&family=Roboto&family=Roboto+Mono&display=swap" rel="stylesheet">
   <title>Tab Notes</title>
   <script type="text/javascript" src="./browser-polyfill.min.js"></script>
   <script type="text/javascript" src="./migration.js"></script>
@@ -18,12 +21,14 @@
     <div class="list-inner">
       <ul></ul>
       <div id="create_entry">+</div>
+      <div id="undo_deletion">undo deletion</div>
     </div>
   </div>
   <label id="list-trigger" for="list-indicator">
     <span></span>
   </label>
-  <textarea id="note-content" placeholder="write some notes..."></textarea>
+  <!--<textarea id="note-content" placeholder="write some notes..."></textarea>-->
+  <div id="note-content" contenteditable="true"></div>
   <div id="mode-switcher" data-current="day"></div>
   <div class="setting-icon-container">
     <div id="setting-icon"></div>

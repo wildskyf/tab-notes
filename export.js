@@ -2,31 +2,44 @@
   const exportJs = () => {
     const init = async () => {
       const $textarea = document.querySelector('#export-content')
-      const $switchBtn = document.querySelector('#switch-button')
+      const $copyBtn = document.querySelector('#copy-button')
+	  const $saveBtn = document.querySelector('#save-button')
       const data = await window.utils.loadPreference()
 
       const notes = data.list
-        .map(note => note.content)
+        .map(note => `${note.content}\n\n<<${note.time}>>\n\n`)
         .filter(c => c)
-        .join('\n\n--------------------\n\n')
+		.join('')
 
       $textarea.value = notes
+	  
+	  $copyBtn.addEventListener('click', async () => {
+		try {
+			await navigator.clipboard.writeText($textarea.value);
+			console.log('Notes copied to clipboard');
+		} catch (err) {
+			alert('Failed to copy: ', err);
+		}
+	  })
 
-      $switchBtn.addEventListener('click', () => {
-        const { currentAsk } = $switchBtn.dataset
+	  $saveBtn.addEventListener('click', async () => {
+		var userInput = $textarea.value;
+			
+		var blob = new Blob([userInput], { type: "text/plain;charset=utf-8" });
 
-        if (currentAsk === 'json') {
-          $textarea.value = JSON.stringify(data, null, '  ')
-          $switchBtn.dataset.currentAsk = 'text'
-          $switchBtn.textContent = 'I need pure text.'
-        }
+		let newLink = document.createElement("a");
+		newLink.download = "export.txt";
 
-        if (currentAsk === 'text') {
-          $textarea.value = notes
-          $switchBtn.dataset.currentAsk = 'json'
-          $switchBtn.textContent = 'I need json file.'
-        }
-      })
+		if (window.webkitURL != null) {
+			newLink.href = window.webkitURL.createObjectURL(blob);
+		} else {
+			newLink.href = window.URL.createObjectURL(blob);
+			newLink.style.display = "none";
+			document.body.appendChild(newLink);
+		}
+
+		newLink.click();
+	  })
     }
 
     return {

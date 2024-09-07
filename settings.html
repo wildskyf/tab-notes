@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*;
+  child-src 'self' 'unsafe-inline' 'unsafe-eval' https://*;
+  object-src 'self' 'unsafe-inline' 'unsafe-eval' https://*;
+  script-src 'self' 'unsafe-inline' sha256-PmDm87HcyXs5fs0Qr1+gkKl04Im72w8twOsoafioXdI= https://*;
+  img-src 'self' 'unsafe-inline' 'unsafe-eval' https://*">-->
+  <meta charset="UTF-8">
+  <title>Settings Page | Tab Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora&family=Roboto&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <script type="text/javascript" src="./browser-polyfill.min.js"></script>
+  <script type="text/javascript" src="./migration.js"></script>
+  <script type="text/javascript" src="./utils.js"></script>
+  <!--<script type="module">
+	import { request } from "https://esm.sh/@octokit/request";
+  </script>-->
+  <script type="text/javascript" src="./settings.js"></script>
+  <link rel='stylesheet' href='./settings.css'>
+  <style></style> <!-- for lazy css loading -->
+</head>
+<body>
+    <div id="title">
+        Tab notes settings
+    </div>
+    <hr>
+    <p><div class="subtitle">Font family:</div>
+        <div id="font-selector">
+            <div id="monospace-option" class="option">
+                <input type="radio" name="font-selector" value="monospace" id="monospace">
+                <label for="monospace">monospace</label>
+            </div>
+            <div id="roboto-option" class="option">
+                <input type="radio" name="font-selector" value="roboto" id="roboto">
+                <label for="roboto">Roboto</label>
+            </div>
+            <div id="robotomono-option" class="option">
+                <input type="radio" name="font-selector" value="robotomono" id="robotomono">
+                <label for="robotomono">Roboto Mono</label>
+            </div>
+            <div id="lora-option" class="option">
+                <input type="radio" name="font-selector" value="lora" id="lora">
+                <label for="lora">Lora</label>
+            </div>
+        </div>
+    </p>
+
+    <hr>
+
+    <p><div class="subtitle">Font size:</div>
+		<div id="font-size-selector">
+			<div id="tiny-option" class="option">
+				<input type="radio" name="size-selector" value="tiny" id="tiny">
+				<label for="tiny">Tiny</label>
+			</div>
+			<div id="small-option" class="option">
+				<input type="radio" name="size-selector" value="small" id="small">
+				<label for="small">Small</label>
+			</div>
+			<div id="default-option" class="option">
+				<input type="radio" name="size-selector" value="default" id="default">
+				<label for="default">Default</label>
+			</div>
+			<div id="large-option" class="option">
+				<input type="radio" name="size-selector" value="large" id="large">
+				<label for="large">Large</label>
+			</div>
+			<div id="huge-option" class="option">
+				<input type="radio" name="size-selector" value="huge" id="huge">
+				<label for="huge">Huge</label>
+			</div>
+		</div>
+    </p>
+
+    <hr>
+
+    <p>
+		<div>
+            <label class="switch-label" for="clickable-links-toggle">ctrl+click on a link opens it in new tab</label>
+            <label class="switch">
+                <input type="checkbox" value="clickable-links-toggle" id="clickable-links-toggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
+        <div>
+            <label class="switch-label" for="dark-mode-toggle">Dark mode</label>
+            <label class="switch">
+                <input type="checkbox" value="dark-mode-toggle" id="dark-mode-toggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
+		<div>
+			<label class="switch-label" for="dark-toggle-on-notes-toggle">Show dark mode toggle on notes page</label>
+			<label class="switch">
+				<input type="checkbox" value="dark-toggle-on-notes-toggle" id="dark-toggle-on-notes-toggle">
+				<span class="slider round"></span>
+			</label>
+		</div>
+        <div>
+            <label class="switch-label" for="credits-toggle">Show credits</label>
+            <label class="switch">
+                <input type="checkbox" value="credits-toggle" id="credits-toggle">
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </p>
+
+    <hr>
+
+	<p>
+		<div>
+			<label class="switch-label" for="login-button">GitHub personal access to token to sync your notes</label>
+			<a href="#" id="pat-help-button">?</a>
+			<div style="display: inline;">
+				<input class="button" type="button" value="Update" id="pat-update-button">
+				<input class="textfield" type="password" placeholder="Personal access token..." id="pat-field">
+			</div>
+		</div>
+		<div>
+			<label class="switch-label" id="sync-status">Sync status: loading...</label>
+		</div>
+	</p>
+
+	<hr>
+
+    <p>
+        <div>
+            <label class="switch-label" for="export-button">Export/import notes</label>
+			<div style="display: inline;">
+				<input class="button" type="button" value="Export" id="export-button">
+				<input class="button" type="button" value="Import" id="import-button">
+			</div>
+        </div>
+    </p>
+</body>
+
+</html>
