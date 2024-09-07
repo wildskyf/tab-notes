@@ -32,8 +32,8 @@
   "commands": {
     "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+Y",
-        "mac": "Command+Y"
+        "default": "Ctrl+U",
+        "mac": "Command+U"
       }
     }
   }
