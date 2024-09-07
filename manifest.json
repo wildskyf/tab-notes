@@ -11,9 +11,9 @@
     "128": "icons/128.png",
     "256": "icons/256.png"
   },
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Tab Notes",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "description": "Allow you to write anything in new tab",
   "permissions": [
     "storage", "unlimitedStorage"
@@ -22,7 +22,7 @@
     "newtab": "newtab.html"
   },
 
-  "browser_action": {
+  "action": {
     "browser_style": true,
     "default_icon": "icons/48.png",
     "default_title": "Tab notes",
@@ -30,9 +30,10 @@
   },
 
   "commands": {
-    "_execute_browser_action": {
+    "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+Y"
+        "default": "Ctrl+Y",
+        "mac": "Command+Y"
       }
     }
   }
