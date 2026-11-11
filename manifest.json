@@ -1,8 +1,11 @@
 {
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
       "id": "note-tab@wildsky.cc",
-      "strict_min_version": "54.0a1"
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   },
   "icons": {
@@ -13,7 +16,7 @@
   },
   "manifest_version": 3,
   "name": "Tab Notes",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Allow you to write anything in new tab",
   "permissions": [
     "storage", "unlimitedStorage"
@@ -23,7 +26,6 @@
   },
 
   "action": {
-    "browser_style": true,
     "default_icon": "icons/48.png",
     "default_title": "Tab notes",
     "default_popup": "newtab.html"
