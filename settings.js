@@ -39,8 +39,8 @@
 
     const _fillSettings = () => {
       _renderTheme()
-        ; ($font_selector.querySelector("#" + Object.keys(FONTS).find(key => FONTS[key] === data.font)) ?? {}).checked = true
-        ; ($font_size_selector.querySelector("#" + Object.keys(FONTSIZE).find(key => FONTSIZE[key] === data.fontsize)) ?? {}).checked = true
+        ; ($font_selector?.querySelector("#" + Object.keys(FONTS).find(key => FONTS[key] === data.font)) ?? {}).checked = true
+        ; ($font_size_selector?.querySelector("#" + Object.keys(FONTSIZE).find(key => FONTSIZE[key] === data.fontsize)) ?? {}).checked = true
       $clickable_links_switch.checked = data.clickablelinks
       $dark_toggle_on_notes_switch.checked = data.darktoggleonnotes
       $dark_mode_switch.checked = data.mode === THEMES.night
@@ -57,7 +57,7 @@
     }
 
     const _fontSizeHandler = () => {
-      $font_size_selector.addEventListener('click', event => {
+      $font_size_selector?.addEventListener('click', event => {
         if (event.target && event.target.matches("input[type='radio']")) {
           data.fontsize = FONTSIZE[event.target.value]
           browser.storage.local.set({ fontsize: data.fontsize })
@@ -113,7 +113,7 @@
     }
 
     const _patUpdateButtonHandler = () => {
-      $pat_update_button.addEventListener('click', async event => {
+      $pat_update_button?.addEventListener('click', async event => {
         if (confirm("This will save your GitHub personal access token in the browser's local storage. If a bad actor gets access to your PC e.g. by using a virus, they could access your personal access token. However, this data is safe from any website related attacks because it only exists purely locally on your PC.\n\nI'm not responsible for any damages that may occur. By clicking OK you confirm that you've read and accept these terms and conditions.")) {
           //I named it map instead of pat, so any malware that auto collects personal access tokens might have more difficulty finding the personal access token
           data.map = $pat_textfield.value
@@ -176,12 +176,14 @@
     }
 
     const _patHelpButtonHandler = () => {
-      $pat_help_button.addEventListener('click', event => {
+      $pat_help_button?.addEventListener('click', event => {
         alert("To sync extensions across multiple devices, generate a personal access token on GitHub with the \"gist\" scope, and enter this personal access token in the input field, then press update.")
       })
     }
 
     const _syncStatusHandler = () => {
+      //the sync controls are hidden in settings.html
+      if (!$sync_status) { return }
       if (data.map != undefined) {
         fetch(`https://api.github.com/gists`, {
           method: "GET",

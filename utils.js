@@ -18,13 +18,17 @@
         return defaultPreference
       }
 
-      if (results.version === defaultPreference.version) {
-        return results
+      if (results.version !== defaultPreference.version && window.migration) {
+        await window.migration(results, syncResults)
       }
-      else {
-        if (window.migration) {
-          await window.migration(results, syncResults)
-        }
+
+      // 3.x saved notes as plain text from a textarea, but 4.x renders them as HTML,
+      // which collapses line breaks. Notes that have line breaks and no tags are still plain text.
+      const isPlainText = content => typeof content === 'string' && content.includes('\n') && !/<[a-z\/!]/i.test(content)
+      const toHTML = content => content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
+      if (Array.isArray(results.list) && results.list.some(note => isPlainText(note.content))) {
+        results.list = results.list.map(note => isPlainText(note.content) ? { ...note, content: toHTML(note.content) } : note)
+        await browser.storage.local.set({ list: results.list })
       }
 
       let updateKeys = Object.keys(defaultPreference).filter( key => results[key] === undefined)
@@ -32,7 +36,7 @@
 
       let update = updateKeys.reduce( (obj, key) => ({
         ...obj,
-        key: defaultPreference[key]
+        [key]: defaultPreference[key]
       }), results)
 
 
