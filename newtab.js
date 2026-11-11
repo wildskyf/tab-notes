@@ -32,6 +32,11 @@
     let undostack = []
 
     let hide_timeout = null
+    let reconnect_timeout = null
+    let reconnect_delay = 5000
+
+    //gist sync is only set up when both the gist id and the token exist
+    const _hasGistSync = () => Boolean(data.gistid && data.map)
 
     //paste text in plaintext, still allow pasting images
     $textarea.addEventListener("paste", function (event) {
@@ -210,34 +215,38 @@ transition-duration: .2s;
           currentNoteId = 0
           browser.storage.local.set({ list: data.list })
 
-          //save to gist
-          fetch(`https://api.github.com/gists/${data.gistid}`, {
-            method: "PATCH",
-            headers: {
-              Accept: "application/vnd.github+json",
-              Authorization: `Bearer ${data.map}`,
-            },
-            body: JSON.stringify({
-              description: `Gist to sync your tab-notes data. Last updated at: ${new Date().toLocaleString()}`,
-              files: { "tab-notes.html": { content: data.list.map(note => `${note.content}\n\n<<${note.time}>>\n\n`).filter(c => c).join('') } }
-            }),
-          }).then(async response => {
-            if (!response.ok) {
-              return response.text().then(text => { throw new Error(text) })
-            }
-            return response.json()
-          }).then(out => {
-            $status.classList.remove('hide')
-            $status.textContent = 'Saved and synced.'
-          })
-            .catch(error => {
+          //save to gist, only when sync is set up
+          if (!_hasGistSync()) {
+            $status.textContent = 'Saved.'
+          } else {
+            fetch(`https://api.github.com/gists/${data.gistid}`, {
+              method: "PATCH",
+              headers: {
+                Accept: "application/vnd.github+json",
+                Authorization: `Bearer ${data.map}`,
+              },
+              body: JSON.stringify({
+                description: `Gist to sync your tab-notes data. Last updated at: ${new Date().toLocaleString()}`,
+                files: { "tab-notes.html": { content: data.list.map(note => `${note.content}\n\n<<${note.time}>>\n\n`).filter(c => c).join('') } }
+              }),
+            }).then(async response => {
+              if (!response.ok) {
+                return response.text().then(text => { throw new Error(text) })
+              }
+              return response.json()
+            }).then(out => {
               $status.classList.remove('hide')
-              $status.textContent = 'Saved locally.'
-              console.log(`An error occured trying to upload the note to a GitHub gist: ${error}`)
-              data.offline = true
-              browser.storage.local.set({ offline: data.offline })
-              _attemptConnection()
+              $status.textContent = 'Saved and synced.'
             })
+              .catch(error => {
+                $status.classList.remove('hide')
+                $status.textContent = 'Saved locally.'
+                console.log(`An error occured trying to upload the note to a GitHub gist: ${error}`)
+                data.offline = true
+                browser.storage.local.set({ offline: data.offline })
+                _attemptConnection()
+              })
+          }
 
           clearTimeout(hide_timeout)
           _render(false);
@@ -363,8 +372,10 @@ transition-duration: .2s;
     }
 
     const _attemptConnection = () => {
-      //attempt to connect to the github gist
-      setTimeout(() => {
+      //attempt to connect to the github gist, keeping a single retry loop with backoff
+      if (!_hasGistSync() || reconnect_timeout) { return }
+      reconnect_timeout = setTimeout(() => {
+        reconnect_timeout = null
         fetch(`https://api.github.com/gists/${data.gistid}`, {
           method: "GET",
           headers: {
@@ -376,12 +387,14 @@ transition-duration: .2s;
             throw new Error()
           }
           console.log("Reconnected successfully")
+          reconnect_delay = 5000
           _syncNotes()
         }).catch(error => {
           console.log(`An error occured while trying to reconnect: ${error}`)
+          reconnect_delay = Math.min(reconnect_delay * 2, 5 * 60 * 1000)
           _attemptConnection()
         })
-      }, 5000)
+      }, reconnect_delay)
     }
 
     const _syncNotes = () => {
@@ -462,6 +475,11 @@ transition-duration: .2s;
         _attemptConnection()
       } else {
         console.log("Can't sync notes, because you haven't configured your settings yet.")
+        //clear the offline flag left by versions that tried to sync without a gist
+        if (data.offline) {
+          data.offline = false
+          browser.storage.local.set({ offline: data.offline })
+        }
       }
     }
 
