@@ -32,11 +32,6 @@
     let undostack = []
 
     let hide_timeout = null
-    let reconnect_timeout = null
-    let reconnect_delay = 5000
-
-    //gist sync is only set up when both the gist id and the token exist
-    const _hasGistSync = () => Boolean(data.gistid && data.map)
 
     //paste text in plaintext, still allow pasting images
     $textarea.addEventListener("paste", function (event) {
@@ -179,9 +174,8 @@ transition-duration: .2s;
     }
 
     const _noteEventHandler = () => {
-      // auto saving and indicator, also a save timeout so you can't exceed GitHub's rate limits
-      let write_timeout, save_timeout;
-      let timed_out = false, buffered = false;
+      // auto saving and indicator
+      let write_timeout
       $textarea.addEventListener('keyup', () => {
         //if note didnt change
         if (data.list[currentNoteId].content === $textarea.innerHTML) { return }
@@ -191,69 +185,21 @@ transition-duration: .2s;
 
         clearTimeout(hide_timeout)
         clearTimeout(write_timeout)
-        write_timeout = setTimeout(() => {
-          if (!timed_out) {
-            _saveNote()
-            timed_out = true
-            save_timeout = setTimeout(() => {
-              timed_out = false
-              if (buffered) {
-                buffered = false
-                _saveNote()
-              }
-            }, 5000)
-          } else {
-            buffered = true
-          }
-        }, 250)
-
-        const _saveNote = async () => {
-          console.log("saving")
-          //save to local storage
-          data.list[currentNoteId].content = $textarea.innerHTML
-          data.list[currentNoteId].time = (new Date()).getTime()
-          currentNoteId = 0
-          browser.storage.local.set({ list: data.list })
-
-          //save to gist, only when sync is set up
-          if (!_hasGistSync()) {
-            $status.textContent = 'Saved.'
-          } else {
-            fetch(`https://api.github.com/gists/${data.gistid}`, {
-              method: "PATCH",
-              headers: {
-                Accept: "application/vnd.github+json",
-                Authorization: `Bearer ${data.map}`,
-              },
-              body: JSON.stringify({
-                description: `Gist to sync your tab-notes data. Last updated at: ${new Date().toLocaleString()}`,
-                files: { "tab-notes.html": { content: data.list.map(note => `${note.content}\n\n<<${note.time}>>\n\n`).filter(c => c).join('') } }
-              }),
-            }).then(async response => {
-              if (!response.ok) {
-                return response.text().then(text => { throw new Error(text) })
-              }
-              return response.json()
-            }).then(out => {
-              $status.classList.remove('hide')
-              $status.textContent = 'Saved and synced.'
-            })
-              .catch(error => {
-                $status.classList.remove('hide')
-                $status.textContent = 'Saved locally.'
-                console.log(`An error occured trying to upload the note to a GitHub gist: ${error}`)
-                data.offline = true
-                browser.storage.local.set({ offline: data.offline })
-                _attemptConnection()
-              })
-          }
-
-          clearTimeout(hide_timeout)
-          _render(false);
-          hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
-        }
+        write_timeout = setTimeout(_saveNote, 250)
       })
       $textarea.focus()
+    }
+
+    const _saveNote = () => {
+      data.list[currentNoteId].content = $textarea.innerHTML
+      data.list[currentNoteId].time = (new Date()).getTime()
+      currentNoteId = 0
+      browser.storage.local.set({ list: data.list })
+
+      $status.textContent = 'Saved.'
+      clearTimeout(hide_timeout)
+      _render(false)
+      hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
     }
 
     const _createButtonEventHandler = () => {
@@ -372,123 +318,12 @@ transition-duration: .2s;
       $migrate_btn.addEventListener('click', migrateBtnOnClick)
     }
 
-    const _attemptConnection = () => {
-      //attempt to connect to the github gist, keeping a single retry loop with backoff
-      if (!_hasGistSync() || reconnect_timeout) { return }
-      reconnect_timeout = setTimeout(() => {
-        reconnect_timeout = null
-        fetch(`https://api.github.com/gists/${data.gistid}`, {
-          method: "GET",
-          headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${data.map}`
-          }
-        }).then(async response => {
-          if (!response.ok) {
-            throw new Error()
-          }
-          console.log("Reconnected successfully")
-          reconnect_delay = 5000
-          _syncNotes()
-        }).catch(error => {
-          console.log(`An error occured while trying to reconnect: ${error}`)
-          reconnect_delay = Math.min(reconnect_delay * 2, 5 * 60 * 1000)
-          _attemptConnection()
-        })
-      }, reconnect_delay)
-    }
-
-    const _syncNotes = () => {
-      //if it's synced with github, then load the data
-      if (!data.offline && data.gistid != undefined) {
-        fetch(`https://api.github.com/gists/${data.gistid}`, {
-          method: "GET",
-          headers: {
-            Accept: "application/vnd.github+json",
-            //Authorization: `Bearer ${data.map}`
-          }
-        }).then(async response => {
-          if (!response.ok) {
-            return response.text().then(text => { throw new Error(text) })
-          }
-          return response.json()
-        }).then(out => {
-          notecontent = out.files["tab-notes.html"].content
-
-          //replace notes content
-          var tmp = notecontent.split(/\n\n<<([0-9]+)>>\n\n/g).slice(0, -1)
-          var newnotes = []
-          for (var i = 0; i < tmp.length; i += 2) {
-            newnotes.push({ content: tmp[i], time: parseInt(tmp[i + 1]) })
-          }
-          data.list = newnotes
-          browser.storage.local.set({ list: data.list })
-
-          //add a "synced" text at the bottom
-          $status.classList.remove('hide')
-          $status.textContent = 'Synced.'
-          _render(false)
-          clearTimeout(hide_timeout)
-          hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
-        }).catch(error => {
-          data.offline = true
-          browser.storage.local.set({ offline: data.offline })
-          console.log(`An error occured trying to load the note content: ${error}`)
-          _attemptConnection()
-        })
-        //if it was offline, push the offline edits to the gist
-      } else if (data.offline && data.gistid != undefined) {
-        //push the current notes to the gist
-        fetch(`https://api.github.com/gists/${data.gistid}`, {
-          method: "PATCH",
-          headers: {
-            Accept: "application/vnd.github+json",
-            Authorization: `Bearer ${data.map}`,
-          },
-          body: JSON.stringify({
-            description: `Gist to sync your tab-notes data. Last updated at: ${new Date().toLocaleString()}`,
-            files: { "tab-notes.html": { content: data.list.map(note => `${note.content}\n\n<<${note.time}>>\n\n`).filter(c => c).join('') } }
-          })
-        }).then(async response => {
-          if (!response.ok) {
-            return response.text().then(text => { throw new Error(text) })
-          }
-          return response.json()
-        }).then(out => {
-          $status.classList.remove('hide')
-          $status.textContent = 'Synced.'
-          data.offline = false
-          browser.storage.local.set({ offline: data.offline })
-          clearTimeout(hide_timeout)
-          _render(false);
-          hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
-        })
-          .catch(error => {
-            console.log(`An error occured trying to upload the note to a GitHub gist: ${error}`)
-            data.offline = true
-            browser.storage.local.set({ offline: data.offline })
-            _attemptConnection()
-          })
-      } else if (data.gistid != undefined) {
-        data.offline = true
-        browser.storage.local.set({ offline: data.offline })
-        console.log(`Couldn't load note content because you're offline`)
-        _attemptConnection()
-      } else {
-        console.log("Can't sync notes, because you haven't configured your settings yet.")
-        //clear the offline flag left by versions that tried to sync without a gist
-        if (data.offline) {
-          data.offline = false
-          browser.storage.local.set({ offline: data.offline })
-        }
-      }
-    }
-
     const init = async () => {
       data = await window.utils.loadPreference()
+      //GitHub sync was removed in 4.0.4, so drop the token and sync state it left behind
+      browser.storage.local.remove(['map', 'gistid', 'offline'])
       //render instantly so screen doesn't stay white
       _render(true)
-      _syncNotes()
       _renderAnnoucement()
       _render(true)
       _renderTheme()

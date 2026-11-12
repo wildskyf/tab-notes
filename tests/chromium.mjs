@@ -1,4 +1,4 @@
-// Chromium checks: no network without sync, legacy sync still works, settings save, default font
+// Chromium checks: no network requests, leftover sync settings removed, settings and fonts work
 import { chromium } from 'playwright'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
@@ -49,17 +49,33 @@ const launch = async githubStatus => {
   await context.close()
 }
 
-// 2. Installs that set up sync before it was hidden keep syncing
+// 2. Leftover GitHub sync settings are deleted and never used
 {
   const { context, requests } = await launch(200)
   const page = await context.newPage()
   await page.goto(`${base}/newtab.html`); await sleep(800)
-  await page.evaluate(() => browser.storage.local.set({ gistid: 'fakegist', map: 'faketoken', offline: false }))
+  await page.evaluate(() => browser.storage.local.set({ gistid: 'fakegist', map: 'faketoken', offline: true }))
   await page.reload(); await sleep(1000)
-  await page.locator('#note-content').type('synced')
-  await sleep(2000)
-  check('legacy sync sends a PATCH to the configured gist', requests.some(r => r === 'PATCH https://api.github.com/gists/fakegist'), requests.join(', '))
-  check('status says Saved and synced.', (await page.textContent('#status')) === 'Saved and synced.')
+  await page.locator('#note-content').type('still local')
+  await sleep(1500)
+  const left = await page.evaluate(() => browser.storage.local.get(['gistid', 'map', 'offline']))
+  check('stored GitHub token and sync state are deleted', Object.keys(left).length === 0, JSON.stringify(left))
+  check('no network requests with old sync settings', requests.length === 0, requests.join(', '))
+  await context.close()
+}
+
+// 3. Font settings are shown and apply to the notes page
+{
+  const { context } = await launch(401)
+  const page = await context.newPage()
+  await page.goto(`${base}/settings.html`); await sleep(1000)
+  check('Roboto Mono and Default size are preselected', await page.evaluate(() =>
+    document.querySelector('#robotomono').checked && document.querySelector('#default').checked))
+  await page.evaluate(() => { document.querySelector('#lora').click(); document.querySelector('#large').click() })
+  await sleep(500)
+  await page.goto(`${base}/newtab.html`); await sleep(1000)
+  const style = await page.evaluate(() => { const cs = getComputedStyle(document.querySelector('#note-content')); return { font: cs.fontFamily, size: cs.fontSize } })
+  check('chosen font and size apply to notes', style.font === 'Lora' && style.size === '30px', JSON.stringify(style))
   await context.close()
 }
 

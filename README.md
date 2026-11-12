@@ -5,7 +5,6 @@ Open a new tab and write anything.
 
 * **Easy-to-use**: Just open new tab, and write down thoughts.
 * **Auto-save**: No worries about saving things when writing.
-* **Cloud sync**: Automatically save your notes across devices using GitHub gists.
 * **Theme**: Support light and dark theme.
 * **Lightweight and fast**
 * **Multiple notes**: Create as many notes as you like.
