@@ -70,10 +70,18 @@
       return emptyNote
     }
 
+    //plain-text title: the first letters and digits of the note in any script, with tags and entities removed
+    const _noteTitle = content => {
+      const text = content.replace(/<[^>]*>/g, ' ').slice(0, 200)
+      //DOMParser decodes entities like &nbsp; without loading images or running scripts
+      const decoded = new DOMParser().parseFromString(text, 'text/html').body.textContent
+      return decoded.replace(/\s+/g, ' ').replace(/[^\p{L}\p{N} ]/gu, '').trim().substr(0, 10)
+    }
+
     const _render = (rendernote) => {
       $body.style.backgroundColor = "#ffffff"
       const _renderList = list => {
-        const _makeTitleString = content => content.substr(0, 50).replace(/<.*?>/g, '').replace(/[^A-Za-z0-9 ]/g, '').substr(0, 10) || '<span class="empty-string">(EMPTY)</span>'
+        const _makeTitleString = content => _noteTitle(content) || '<span class="empty-string">(EMPTY)</span>'
         const $ul = document.querySelector('ul')
 
         $ul.innerHTML = list.sort((a, b) => b.time - a.time).map((item, index) => {
@@ -94,7 +102,7 @@
             if (event.target.classList.contains('del')) {
               const currentNote = list[index]
               if (currentNote.content !== '') {
-                const noteTitle = _makeTitleString(currentNote.content)
+                const noteTitle = _noteTitle(currentNote.content) || '(EMPTY)'
                 const deleteConfirmString = `Do you want to delete note: ${noteTitle}?`
                 if (!confirm(deleteConfirmString)) { return }
               }
@@ -120,7 +128,7 @@
             else if (event.target.classList.contains('dnld') || event.target.classList.contains('dnldimg')) {
               currentNoteId = index
               _render(true)
-              const noteTitle = _makeTitleString(list[index].content)
+              const noteTitle = _noteTitle(list[index].content) || 'note'
               //const dbutton = $li.querySelector('.dnld');
               //console.log(dbutton);
 
@@ -174,9 +182,9 @@ transition-duration: .2s;
     }
 
     const _noteEventHandler = () => {
-      // auto saving and indicator
+      // auto saving and indicator; "input" also covers mouse paste, drag and drop, and undo from the menu
       let write_timeout
-      $textarea.addEventListener('keyup', () => {
+      $textarea.addEventListener('input', () => {
         //if note didnt change
         if (data.list[currentNoteId].content === $textarea.innerHTML) { return }
 
@@ -190,16 +198,43 @@ transition-duration: .2s;
       $textarea.focus()
     }
 
-    const _saveNote = () => {
-      data.list[currentNoteId].content = $textarea.innerHTML
-      data.list[currentNoteId].time = (new Date()).getTime()
+    const _saveNote = async () => {
+      const edited = data.list[currentNoteId]
+      const note = { content: $textarea.innerHTML, time: (new Date()).getTime() }
+      //merge into the latest stored list, so notes saved meanwhile by another Tab Notes page are kept
+      const { list = [] } = await browser.storage.local.get('list')
+      const index = list.findIndex(n => n.time === edited.time)
+      //if another page changed or deleted this note meanwhile, keep both versions
+      if (index >= 0) { list[index] = note } else { list.unshift(note) }
+      data.list = list.sort((a, b) => b.time - a.time)
       currentNoteId = 0
-      browser.storage.local.set({ list: data.list })
+      await browser.storage.local.set({ list: data.list })
 
       $status.textContent = 'Saved.'
       clearTimeout(hide_timeout)
       _render(false)
       hide_timeout = setTimeout(() => $status.classList.add('hide'), 3000)
+    }
+
+    //another Tab Notes page (a tab or the toolbar popup) saved, so show its changes here
+    const _storageChangeHandler = () => {
+      const signature = list => list.map(note => `${note.time}:${note.content.length}`).join()
+      browser.storage.onChanged.addListener((changes, area) => {
+        if (area !== 'local' || !changes.list || !changes.list.newValue) { return }
+        const list = changes.list.newValue
+        //this page's own save
+        if (signature(list) === signature(data.list)) { return }
+
+        const current = data.list[currentNoteId]
+        const unsaved = Boolean(current) && $textarea.innerHTML !== current.content
+        //keep the note being typed even if the other page changed or deleted it; the next save adds it back
+        if (unsaved && !list.some(note => note.time === current.time)) { list.push(current) }
+        //sort before looking up the index, since rendering sorts the list too
+        data.list = list.sort((a, b) => b.time - a.time)
+        currentNoteId = current ? Math.max(data.list.findIndex(note => note.time === current.time), 0) : 0
+        //leave the editor alone while typing; otherwise show the latest content
+        _render(!unsaved)
+      })
     }
 
     const _createButtonEventHandler = () => {
@@ -286,6 +321,7 @@ transition-duration: .2s;
 
     const _initEventHandler = () => {
       _noteEventHandler()
+      _storageChangeHandler()
       _createButtonEventHandler()
       _undoButtonEventHandler()
       _themeSwitchHandler()
