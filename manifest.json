@@ -16,7 +16,7 @@
   },
   "manifest_version": 3,
   "name": "Tab Notes",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "Allow you to write anything in new tab",
   "permissions": [
     "storage", "unlimitedStorage"
