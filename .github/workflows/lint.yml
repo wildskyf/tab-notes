@@ -1,0 +1,16 @@
+name: Lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  web-ext-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lint the extension as addons.mozilla.org does
+        run: npx --yes web-ext@10 lint
