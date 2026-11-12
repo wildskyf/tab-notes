@@ -18,11 +18,10 @@ Open a new tab and write anything.
 
 ## Shortcuts
 
-- `Ctrl/Cmd + Y`: To open the browser-action tab notes.
+- `Ctrl/Cmd + U`: To open the browser-action tab notes.
 
 ## Download
 
-*These downloads don't include any changes from this fork*
 Tab Notes is available to the following browsers:
 * [Firefox](https://addons.mozilla.org/firefox/addon/tab-notes/)
 * [Chrome](https://chrome.google.com/webstore/detail/tab-notes/obnnegakmgonaiplaobihpmcjhlceeic)
@@ -30,3 +29,11 @@ Tab Notes is available to the following browsers:
 ## Screenshot
 
 ![screenshot](./screenshot.png)
+
+## Development
+
+The extension has no build step: load this folder as an unpacked or temporary extension.
+
+- Lint (also runs on every push): `npx web-ext@10 lint`
+- Package for both stores: `npx web-ext@10 build`, which writes `dist/tab_notes-<version>.zip`. `web-ext-config.mjs` lists the files left out of the package.
+- Tests: `cd tests && npm install && npm test`. They build the package first, then check it in Chromium and check the upgrade from 3.2.0 in a local Firefox 140+ (set `FIREFOX_BIN` if Firefox is not in `/Applications`).
