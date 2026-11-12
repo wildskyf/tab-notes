@@ -280,9 +280,10 @@ transition-duration: .2s;
     }
 
     const _renderTheme = () => {
-      $textarea.style.fontFamily = data.font
-      $textarea.style.fontSize = data.fontsize + "px"
-      $textarea.style.lineHeight = data.fontsize * 1.5 + "px"
+      //font and font size stay unset until chosen in settings, so fall back to the stylesheet instead of "undefined"
+      $textarea.style.fontFamily = data.font || ''
+      $textarea.style.fontSize = data.fontsize ? data.fontsize + "px" : ''
+      $textarea.style.lineHeight = data.fontsize ? data.fontsize * 1.5 + "px" : ''
       if (data.mode == THEMES.night) {
         $body.classList.add('dark')
         $textarea.classList.add('dark')
