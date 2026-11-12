@@ -1,0 +1,14 @@
+{
+  "name": "tab-notes-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node chromium.mjs && node firefox-upgrade.mjs",
+    "test:chromium": "node chromium.mjs",
+    "test:firefox": "node firefox-upgrade.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "puppeteer-core": "25.17.0"
+  }
+}
