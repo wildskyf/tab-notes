@@ -143,4 +143,41 @@ const launch = async githubStatus => {
   await context.close()
 }
 
+// 7. Import adds notes from every export format and never wipes existing notes
+{
+  const { context } = await launch(401)
+  const page = await context.newPage()
+  const dialogs = []
+  page.on('dialog', d => { dialogs.push(d.message()); d.accept() })
+  const importText = async text => {
+    await page.goto(`${base}/newtab.html`); await sleep(500)
+    await page.evaluate(() => browser.storage.local.set({ list: [{ content: 'existing', time: 100 }] }))
+    await page.goto(`${base}/import.html`); await sleep(500)
+    await page.fill('#import-content', text)
+    await page.click('#import-button'); await sleep(400)
+    const result = await page.textContent('#import-result')
+    const notes = await page.evaluate(() => browser.storage.local.get().then(s => s.list.map(n => n.content)))
+    return { result, notes }
+  }
+  let r = await importText('one\n\n<<10>>\n\ntwo\n\n<<20>>')
+  check('4.x export with trimmed trailing newlines', JSON.stringify(r.notes) === JSON.stringify(['existing', 'two', 'one']) && r.result === 'Imported 2 notes.', JSON.stringify(r))
+  r = await importText('only note\n\n<<10>>')
+  check('single 4.x note', JSON.stringify(r.notes) === JSON.stringify(['existing', 'only note']), JSON.stringify(r))
+  r = await importText(JSON.stringify({ version: 5, mode: 'day', list: [{ content: 'from json', time: 50 }, { content: 'existing', time: 40 }] }, null, '  '))
+  check('3.2.0 JSON export, skipping a note that already exists', JSON.stringify(r.notes) === JSON.stringify(['existing', 'from json']) && r.result === 'Imported 1 note, skipped 1 already there or empty.', JSON.stringify(r))
+  r = await importText('first plain\nnote\n\n--------------------\n\nsecond plain')
+  check('3.2.0 plain-text export', JSON.stringify(r.notes) === JSON.stringify(['first plain\nnote', 'second plain', 'existing']), JSON.stringify(r))
+  await page.goto(`${base}/newtab.html`); await sleep(800)
+  const converted = await page.evaluate(() => browser.storage.local.get().then(s => s.list[0].content))
+  check('imported plain-text note keeps its line break', converted === 'first plain<br>note', converted)
+  dialogs.length = 0
+  r = await importText('just some text')
+  check('unknown text asks first, then adds one note', dialogs.length === 1 && JSON.stringify(r.notes) === JSON.stringify(['just some text', 'existing']), JSON.stringify({ r, dialogs }))
+  const errors = []
+  page.on('pageerror', e => errors.push(e.message))
+  await page.goto(`${base}/newtab.html`); await sleep(800)
+  check('new tab still works after importing', errors.length === 0, errors.join(', '))
+  await context.close()
+}
+
 finish()
