@@ -27,6 +27,7 @@
     $import_button = document.querySelector("#import-button")
     $clickable_links_switch = document.querySelector("#clickable-links-toggle")
     $dark_mode_switch = document.querySelector("#dark-mode-toggle")
+    $follow_system_switch = document.querySelector("#follow-system-toggle")
     $dark_toggle_on_notes_switch = document.querySelector("#dark-toggle-on-notes-toggle")
     $credits_switch = document.querySelector("#credits-toggle")
     $body = document.querySelector("body")
@@ -40,7 +41,6 @@
         ; ($font_size_selector.querySelector("#" + Object.keys(FONTSIZE).find(key => FONTSIZE[key] === (data.fontsize || FONTSIZE.default))) ?? {}).checked = true
       $clickable_links_switch.checked = data.clickablelinks
       $dark_toggle_on_notes_switch.checked = data.darktoggleonnotes
-      $dark_mode_switch.checked = data.mode === THEMES.night
       $credits_switch.checked = data.showcredits
     }
 
@@ -71,14 +71,21 @@
 
     const _darkModeSwitchHandler = () => {
       $dark_mode_switch.addEventListener('click', event => {
-        $body.classList.toggle('dark')
-        //$textarea.classList.toggle('dark')
-        //$list.classList.toggle('dark')
-
-        data.mode = data.mode === THEMES.day ? THEMES.night : THEMES.day
-        browser.storage.local.set({ mode: data.mode })
+        //choosing a theme by hand stops following the system
+        data.mode = window.utils.isDark(data) ? THEMES.day : THEMES.night
+        data.followsystem = false
+        browser.storage.local.set({ mode: data.mode, followsystem: data.followsystem })
         _renderTheme()
       })
+    }
+
+    const _followSystemSwitchHandler = () => {
+      $follow_system_switch.addEventListener('click', event => {
+        data.followsystem = $follow_system_switch.checked
+        browser.storage.local.set({ followsystem: data.followsystem })
+        _renderTheme()
+      })
+      window.utils.systemDarkMode.addEventListener('change', _renderTheme)
     }
 
     const _darkToggleOnNotesHandler = () => {
@@ -110,18 +117,10 @@
     }
 
     const _renderTheme = () => {
-      if (data.mode == THEMES.night) {
-        $body.classList.add('dark')
-        $dark_mode_switch.checked = true
-        //$textarea.classList.add('dark')
-        //$list.classList.add('dark')
-      }
-      else {
-        $body.classList.remove('dark')
-        $dark_mode_switch.checked = false
-        //$textarea.classList.remove('dark')
-        //$list.classList.remove('dark')
-      }
+      const dark = window.utils.isDark(data)
+      $body.classList.toggle('dark', dark)
+      $dark_mode_switch.checked = dark
+      $follow_system_switch.checked = Boolean(data.followsystem)
     }
 
     const _multiTabHandler = () => {
@@ -139,6 +138,7 @@
       _fontSizeHandler()
       _clickableLinksSwitchHandler()
       _darkModeSwitchHandler()
+      _followSystemSwitchHandler()
       _darkToggleOnNotesHandler()
       _creditsSwitchHandler()
       _exportButtonHandler()

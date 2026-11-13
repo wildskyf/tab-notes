@@ -7,7 +7,8 @@ const defaultPreference = {
     time: (new Date()).getTime()
   }],
   showcredits: true,
-  darktoggleonnotes: true
+  darktoggleonnotes: true,
+  trash: []
 }
 
   ; (() => {

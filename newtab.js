@@ -26,10 +26,12 @@
     const $status = document.querySelector('#status')
     const $create_entry = document.querySelector('#create_entry')
     const $undo_deletion = document.querySelector("#undo_deletion")
+    const $list_indicator = document.querySelector('#list-indicator')
 
     let currentNoteId = 0
     let data = null
-    let undostack = []
+    //deleted notes are kept in storage (the latest 20), so undo still works after closing the tab
+    const TRASH_SIZE = 20
 
     let hide_timeout = null
 
@@ -90,7 +92,7 @@
           return `<li class="${className}" data-id="${index}"><span>${title}<div class='del'>+</div><div class='dnld'><img class="dnldimg" src="./dnld.png" alt="Download"></div></span></li>`
         }).join('')
 
-        if (undostack.length > 0) {
+        if (data.trash.length > 0) {
           $undo_deletion.style.display = "block"
         } else {
           $undo_deletion.style.display = "none"
@@ -109,18 +111,18 @@
               //this code is responsible for deleting notes
               //if after deleting this note, the list of notes will be empty:
               if (index === 0 && data.list.length === 1) {
-                undostack.push(data.list[index])
+                data.trash = [...data.trash, data.list[index]].slice(-TRASH_SIZE)
                 data.list = [_emptyNote()]
               }
               //if after deleting this note, the list of notes is not empty:
               else {
-                undostack.push(data.list[index])
+                data.trash = [...data.trash, data.list[index]].slice(-TRASH_SIZE)
                 data.list = data.list.filter((note, i) => i !== index)
                 if (currentNoteId >= data.list.length) {
                   currentNoteId = data.list.length - 1
                 }
               }
-              browser.storage.local.set({ list: data.list })
+              browser.storage.local.set({ list: data.list, trash: data.trash })
 
               _render(true)
               return
@@ -220,7 +222,12 @@ transition-duration: .2s;
     const _storageChangeHandler = () => {
       const signature = list => list.map(note => `${note.time}:${note.content.length}`).join()
       browser.storage.onChanged.addListener((changes, area) => {
-        if (area !== 'local' || !changes.list || !changes.list.newValue) { return }
+        if (area !== 'local') { return }
+        if (changes.trash) {
+          data.trash = changes.trash.newValue || []
+          if (!changes.list) { _render(false) }
+        }
+        if (!changes.list || !changes.list.newValue) { return }
         const list = changes.list.newValue
         //this page's own save
         if (signature(list) === signature(data.list)) { return }
@@ -249,9 +256,10 @@ transition-duration: .2s;
 
     const _undoButtonEventHandler = () => {
       $undo_deletion.addEventListener('click', () => {
-        if (undostack.length > 0) {
-          data.list = [...data.list, undostack.pop()]
-          browser.storage.local.set({ list: data.list })
+        if (data.trash.length > 0) {
+          data.list = [...data.list, data.trash[data.trash.length - 1]]
+          data.trash = data.trash.slice(0, -1)
+          browser.storage.local.set({ list: data.list, trash: data.trash })
 
           _render(true)
         } else {
@@ -265,7 +273,7 @@ transition-duration: .2s;
       $textarea.style.fontFamily = data.font || ''
       $textarea.style.fontSize = data.fontsize ? data.fontsize + "px" : ''
       $textarea.style.lineHeight = data.fontsize ? data.fontsize * 1.5 + "px" : ''
-      if (data.mode == THEMES.night) {
+      if (window.utils.isDark(data)) {
         $body.classList.add('dark')
         $textarea.classList.add('dark')
         $list.classList.add('dark')
@@ -279,17 +287,25 @@ transition-duration: .2s;
       }
       $mode_switcher.hidden = !data.darktoggleonnotes
       $credits_button.hidden = !data.showcredits
+      $list_indicator.checked = Boolean(data.listopen)
     }
 
     const _themeSwitchHandler = () => {
       $mode_switcher.addEventListener('click', event => {
-        $body.classList.toggle('dark')
-        $textarea.classList.toggle('dark')
-        $list.classList.toggle('dark')
-
-        data.mode = data.mode === THEMES.day ? THEMES.night : THEMES.day
-        browser.storage.local.set({ mode: data.mode })
+        //choosing a theme by hand stops following the system
+        data.mode = window.utils.isDark(data) ? THEMES.day : THEMES.night
+        data.followsystem = false
+        browser.storage.local.set({ mode: data.mode, followsystem: data.followsystem })
         _renderTheme()
+      })
+      window.utils.systemDarkMode.addEventListener('change', _renderTheme)
+    }
+
+    //remember whether the note list was left open
+    const _listToggleHandler = () => {
+      $list_indicator.addEventListener('change', () => {
+        data.listopen = $list_indicator.checked
+        browser.storage.local.set({ listopen: data.listopen })
       })
     }
 
@@ -325,6 +341,7 @@ transition-duration: .2s;
       _createButtonEventHandler()
       _undoButtonEventHandler()
       _themeSwitchHandler()
+      _listToggleHandler()
       _settingHandler()
       _multiTabHandler()
     }

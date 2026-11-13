@@ -180,4 +180,64 @@ const launch = async githubStatus => {
   await context.close()
 }
 
+// 8. #29: follow the system's dark mode, live, until a theme is chosen by hand
+{
+  const { context } = await launch(401)
+  const page = await context.newPage()
+  await page.emulateMedia({ colorScheme: 'light' })
+  await page.goto(`${base}/settings.html`); await sleep(800)
+  await page.evaluate(() => document.querySelector('#follow-system-toggle').click()); await sleep(300)
+  await page.goto(`${base}/newtab.html`); await sleep(800)
+  const isDark = () => page.evaluate(() => document.body.classList.contains('dark'))
+  const lightFirst = await isDark()
+  await page.emulateMedia({ colorScheme: 'dark' }); await sleep(300)
+  check('follows the system theme live', lightFirst === false && await isDark() === true)
+  await page.click('#mode-switcher'); await sleep(300)
+  const stored = await page.evaluate(() => browser.storage.local.get(['mode', 'followsystem']))
+  check('choosing a theme by hand stops following the system', await isDark() === false && stored.followsystem === false && stored.mode === 'day', JSON.stringify(stored))
+  await context.close()
+}
+
+// 9. #31: the note list stays open or closed as it was left
+{
+  const { context } = await launch(401)
+  const page = await context.newPage()
+  await page.goto(`${base}/newtab.html`); await sleep(800)
+  const closedAtFirst = !(await page.isChecked('#list-indicator'))
+  await page.click('#list-trigger'); await sleep(300)
+  await page.reload(); await sleep(800)
+  const openAfterReload = await page.isChecked('#list-indicator')
+  await page.click('#list-trigger'); await sleep(300)
+  await page.reload(); await sleep(800)
+  check('note list open state is remembered', closedAtFirst && openAfterReload && !(await page.isChecked('#list-indicator')))
+  await context.close()
+}
+
+// 10. #22: deleted notes can be restored after the tab is closed, from any page
+{
+  const { context } = await launch(401)
+  const page = await context.newPage()
+  page.on('dialog', d => d.accept())
+  await page.goto(`${base}/newtab.html`); await sleep(500)
+  await page.evaluate(() => browser.storage.local.set({ list: [{ content: 'keep', time: 2 }, { content: 'delete me', time: 1 }], trash: [] }))
+  await page.reload(); await sleep(800)
+  await page.$$eval('#list li .del', buttons => buttons[1].click()); await sleep(300)
+  await page.close()
+  const again = await context.newPage()
+  again.on('dialog', d => d.accept())
+  await again.goto(`${base}/newtab.html`); await sleep(800)
+  const undoShown = await again.$eval('#undo_deletion', e => getComputedStyle(e).display !== 'none')
+  //the button sits in the note list panel, which is closed here
+  await again.$eval('#undo_deletion', e => e.click()); await sleep(300)
+  const after = await again.evaluate(() => browser.storage.local.get(['list', 'trash']))
+  check('undo works after closing the tab', undoShown && after.list.some(n => n.content === 'delete me') && after.trash.length === 0, JSON.stringify(after))
+
+  await again.evaluate(() => browser.storage.local.set({ trash: Array.from({ length: 20 }, (_, i) => ({ content: `old ${i}`, time: i })) }))
+  await sleep(300)
+  await again.$$eval('#list li .del', buttons => buttons[0].click()); await sleep(300)
+  const trash = await again.evaluate(() => browser.storage.local.get('trash').then(s => s.trash))
+  check('trash keeps only the latest 20 notes', trash.length === 20 && trash[0].content === 'old 1', `${trash.length}, first: ${trash[0].content}`)
+  await context.close()
+}
+
 finish()

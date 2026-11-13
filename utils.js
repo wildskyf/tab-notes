@@ -42,6 +42,11 @@
 
       await browser.storage.local.set(update)
       return update
-    }
+    },
+
+    systemDarkMode: window.matchMedia('(prefers-color-scheme: dark)'),
+
+    //dark when following a dark system theme, or when dark mode was chosen by hand
+    isDark: data => data.followsystem ? window.utils.systemDarkMode.matches : data.mode === 'night'
   }
 })()
