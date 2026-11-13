@@ -5,7 +5,7 @@ Open a new tab and write anything.
 
 * **Easy-to-use**: Just open new tab, and write down thoughts.
 * **Auto-save**: No worries about saving things when writing.
-* **Theme**: Support light and dark theme.
+* **Theme**: Light and dark theme, or follow the system's setting.
 * **Lightweight and fast**
 * **Multiple notes**: Create as many notes as you like.
 * **Browser-action with shortcut**: You could use it without changing your current new tab page.
@@ -13,6 +13,8 @@ Open a new tab and write anything.
 * **Images**: Paste images in your notes.
 * **Styled text**: Make your text bold, italic or underlined.
 * **Links**: Paste links to websites
+* **To-do checkboxes**: Type `[ ] ` at the start of a line to get a checkbox, and click it to check it off.
+* **Undo deletion**: Restore the last 20 deleted notes, even after closing the tab.
 * Open-source
 
 ## Shortcuts

@@ -240,4 +240,38 @@ const launch = async githubStatus => {
   await context.close()
 }
 
+// 11. #20: "[ ] " at the start of a line becomes a checkbox that toggles on click
+{
+  const { context } = await launch(401)
+  const page = await context.newPage()
+  await page.goto(`${base}/newtab.html`); await sleep(800)
+  await page.focus('#note-content')
+  await page.keyboard.type('[ ] buy milk')
+  await page.keyboard.press('Enter')
+  await page.keyboard.type('[] call mom')
+  await page.keyboard.press('Enter')
+  await page.keyboard.type('not a box [ ] here')
+  await sleep(600)
+  const text = () => page.$eval('#note-content', e => e.innerText.replace(/\u00a0/g, ' '))
+  check('"[ ] " and "[] " at line start become ☐, not mid-line', await text() === '☐ buy milk\n☐ call mom\nnot a box [ ] here', JSON.stringify(await text()))
+
+  const boxCenter = () => page.evaluate(() => {
+    const walker = document.createTreeWalker(document.querySelector('#note-content'), NodeFilter.SHOW_TEXT)
+    const node = walker.nextNode()
+    const range = document.createRange(); range.setStart(node, 0); range.setEnd(node, 1)
+    const r = range.getBoundingClientRect()
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2, left: r.left }
+  })
+  let box = await boxCenter()
+  await page.mouse.click(box.x, box.y); await sleep(600)
+  const stored = await page.evaluate(() => browser.storage.local.get().then(s => s.list[0].content))
+  check('clicking ☐ checks it and saves', (await text()).startsWith('☑ buy milk') && stored.replace(/&nbsp;/g, ' ').startsWith('☑ buy milk'), stored)
+  box = await boxCenter()
+  await page.mouse.click(box.x, box.y); await sleep(300)
+  check('clicking ☑ unchecks it', (await text()).startsWith('☐ buy milk'))
+  await page.mouse.click(box.left - 30, box.y); await sleep(300)
+  check('clicking the margin next to a box does not toggle it', (await text()).startsWith('☐ buy milk'))
+  await context.close()
+}
+
 finish()

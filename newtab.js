@@ -56,6 +56,55 @@
       }
     })
 
+    //to-do checkboxes: "[ ] " at the start of a line becomes ☐, and clicking ☐ or ☑ toggles it
+    const UNCHECKED = '☐', CHECKED = '☑'
+
+    //a text node starts a line when nothing inline comes before it in the same block
+    const _startsLine = node => {
+      const prev = node.previousSibling
+      return !prev || prev.nodeName === 'BR' || /^(DIV|P|LI)$/.test(prev.nodeName)
+    }
+
+    $textarea.addEventListener('input', event => {
+      if (event.inputType !== 'insertText' || event.data !== ' ') { return }
+      const selection = document.getSelection()
+      const node = selection.anchorNode
+      if (!node || node.nodeType !== Node.TEXT_NODE) { return }
+      const offset = selection.anchorOffset
+      const before = node.textContent.slice(0, offset)
+      //browsers insert a no-break space when typing a space at the end of a line
+      const match = before.match(/(^|\n)\[[  ]?\][  ]$/)
+      if (!match || (match.index === 0 && !match[1] && !_startsLine(node))) { return }
+      const start = match.index + match[1].length
+      //a no-break space, since a plain trailing space would collapse
+      node.textContent = before.slice(0, start) + UNCHECKED + '\u00a0' + node.textContent.slice(offset)
+      selection.collapse(node, start + 2)
+    })
+
+    $textarea.addEventListener('click', event => {
+      //find the character under the pointer (caretPositionFromPoint in Firefox, caretRangeFromPoint in Chromium)
+      const position = document.caretPositionFromPoint
+        ? document.caretPositionFromPoint(event.clientX, event.clientY)
+        : document.caretRangeFromPoint(event.clientX, event.clientY)
+      if (!position) { return }
+      const node = position.offsetNode || position.startContainer
+      const offset = position.offset ?? position.startOffset
+      if (!node || node.nodeType !== Node.TEXT_NODE) { return }
+      const text = node.textContent
+      //the caret lands before or after the box depending on which half was clicked
+      const index = [offset, offset - 1].find(i => text[i] === UNCHECKED || text[i] === CHECKED)
+      if (index === undefined) { return }
+      //only toggle when the pointer is on the box itself, not in the margin next to it
+      const range = document.createRange()
+      range.setStart(node, index)
+      range.setEnd(node, index + 1)
+      const box = range.getBoundingClientRect()
+      if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) { return }
+      node.textContent = text.slice(0, index) + (text[index] === UNCHECKED ? CHECKED : UNCHECKED) + text.slice(index + 1)
+      document.getSelection().collapse(node, index + 1)
+      $textarea.dispatchEvent(new Event('input'))
+    })
+
     function clickedword() {
       var sel = document.getSelection();
       sel.modify("extend", "backward", "paragraphboundary");

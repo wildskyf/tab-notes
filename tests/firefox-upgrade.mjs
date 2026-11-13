@@ -90,6 +90,25 @@ await evalIn(tab, `document.querySelector('#dark-mode-toggle').click(), 1`)
 await sleep(500)
 check('settings dark mode switch saves', (await evalIn(tab, `browser.storage.local.get().then(s => s.mode)`)) === 'night')
 
+// to-do checkboxes use caretPositionFromPoint in Firefox
+await evalIn(tab, `browser.storage.local.set({ list: [{ content: '', time: Date.now() }] }).then(() => 1)`)
+await closeTabs()
+tab = await openPage('newtab.html')
+await typeInto(tab, '#note-content', '[ ] task')
+await sleep(800)
+const noteText = () => evalIn(tab, `document.querySelector('#note-content').innerText.replace(/\\u00a0/g, ' ')`)
+check('"[ ] " becomes a checkbox in Firefox', (await noteText()) === '☐ task', JSON.stringify(await noteText()))
+const box = JSON.parse(await evalIn(tab, `(() => {
+  const node = document.createTreeWalker(document.querySelector('#note-content'), NodeFilter.SHOW_TEXT).nextNode()
+  const range = document.createRange(); range.setStart(node, 0); range.setEnd(node, 1)
+  const r = range.getBoundingClientRect()
+  return JSON.stringify({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top + r.height / 2) })
+})()`))
+await bidi.send('input.performActions', { context: tab, actions: [{ type: 'pointer', id: 'mouse', actions: [
+  { type: 'pointerMove', x: box.x, y: box.y }, { type: 'pointerDown', button: 0 }, { type: 'pointerUp', button: 0 }] }] })
+await sleep(800)
+check('clicking the checkbox toggles it in Firefox', (await noteText()) === '☑ task', JSON.stringify(await noteText()))
+
 check('no network requests at all', requests.length === 0, requests.join(', '))
 await browser.close()
 finish()
